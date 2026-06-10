@@ -450,8 +450,19 @@ function vLeads(){
       ${l.notes?`<div class="muted small" style="margin-top:6px">📝 ${esc(l.notes)}</div>`:''}</div>`;
   }).join(''):'<div class="card empty">אין לידים בסינון הזה.</div>';
   const f=(v,l)=>`<button class="chip" style="${leadFilter===v?'background:var(--accent);color:#06122a;border-color:var(--accent)':''}" onclick="leadFilter='${v}';render()">${l}</button>`;
-  return `<div class="row spread"><b>לידים (${p.leads.length})</b><button class="btn" onclick="editLead()">➕ הוסף ליד</button></div>
+  return `<div class="row spread"><b>לידים (${p.leads.length})</b><button class="btn" onclick="editLead()">➕ הוסף ליד (מלא)</button></div>
+    <div class="card" style="padding:12px"><div class="row" style="gap:6px">
+      <input id="quickLead" placeholder="⚡ הוספה מהירה — שם או קישור, Enter" onkeydown="if(event.key==='Enter')quickAddLead()" style="flex:1;min-width:160px">
+      <button class="btn" onclick="quickAddLead()">➕ הוסף</button>
+    </div><div class="muted small" style="margin-top:6px">נוצר ליד עם סטטוס "פנייה ראשונה". אפשר ללחוץ ✏️ אחר כך להוסיף פרטים.</div></div>
     <div class="row" style="gap:6px;margin:10px 0 14px">${f('all','הכל')}${f('new','פנייה')}${f('dm','בפרטי')}${f('demo','דמו')}${f('customer','לקוח')}${f('lost','אבוד')}</div>${items}`;
+}
+function quickAddLead(){
+  const el=document.getElementById('quickLead'); const v=(el?el.value:'').trim(); if(!v)return;
+  const isUrl=/^https?:\/\//i.test(v);
+  const lead={id:uid(),status:'new',date:todayStr()};
+  if(isUrl){ lead.name='ליד חדש'; lead.link=v; } else { lead.name=v; }
+  P().leads.push(lead); save(); render(); toast('ליד נוסף ✓');
 }
 function editLead(id){
   const p=P(),l=id?p.leads.find(x=>x.id===id):{status:'new',date:todayStr()};
