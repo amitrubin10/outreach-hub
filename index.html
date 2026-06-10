@@ -124,14 +124,14 @@ const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;
 
 const DEFAULT_KEYWORDS=['דמי ועד','רודף אחרי','רודפת אחרי','מי שילם','גזבר','ניהול ועד','אקסל ועד','ועד בית'];
 function vbReplies(){return [
-  {id:uid(),title:'אמפתיה → פתרון → בפרטי ⭐',body:'מכיר את התחושה הזו טוב מדי 😅 גם אני נשברתי מהרדיפה הזו, אז בניתי כלי שמתחבר לדף הבנק ומזהה לבד מי שילם. אם בא לך — אשלח לך פרטים בפרטי 🙂'},
-  {id:uid(),title:'קצרה במיוחד',body:'אני מרגיש אותך 🙏 יש פתרון שמתחבר לדף הבנק ומזהה אוטומטית מי שילם, בלי אקסל. רוצה שאשלח פרטים בפרטי?'},
-  {id:uid(),title:'סיפור אישי',body:'בדיוק בגלל זה בניתי תוכנה — אני גזבר בבניין של 70 דירות ונשבר לי. מתחברת לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד. אשמח לפרט בפרטי 🙏'},
-  {id:uid(),title:'ערך-קודם',body:'יש כלי שמתחבר לדף הבנק ומזהה לבד מי שילם — בלי אקסל ובלי שהכסף עובר דרך גורם שלישי עם עמלות. אם מעניין, שלח/י לי הודעה ואשמח לעזור.'},
-  {id:uid(),title:'הודעה בפרטי (DM)',body:'היי 🙂 ראיתי את הפוסט שלך על ניהול הוועד. אני גזבר בעצמי ובניתי כלי בשם VeriBayit שמתחבר לדף הבנק ומזהה לבד מי שילם (הכסף נשאר בחשבון הוועד, בלי עמלות סליקה). יש דמו חינם ל-3 ימים בלי כרטיס אשראי — רוצה שאשלח קישור?'},
-  {id:uid(),title:'📩 פרטי + דמו ⭐',body:'היי 🙂 ראיתי שכתבת על הקושי בניהול הוועד, אז כמו שהבטחתי — הכלי שבניתי נקרא VeriBayit. הוא מתחבר לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד (בלי גורם שלישי ובלי עמלות סליקה).\nאפשר פשוט לנסות בדמו חינם ל-3 ימים, בלי כרטיס אשראי 👇\nhttps://www.veribayit.com/demo\nאם יהיו שאלות — אני כאן 🙏'},
-  {id:uid(),title:'📩 פרטי — סיפור מייסד',body:'היי 🙂 אני עמית, גזבר בבניין של 70 דירות. נמאס לי מהרדיפה החודשית, אז בניתי כלי שעושה את זה לבד — מתחבר לדף הבנק ומזהה מי שילם.\nתרגיש/י חופשי להתרשם: https://www.veribayit.com (יש גם דמו חינם 3 ימים).\nשמח לעזור בכל שאלה, בלי שום התחייבות 🙏'},
-  {id:uid(),title:'📩 פרטי + ליווי',body:'נעים מאוד 🙂 כמו שכתבתי בקבוצה — VeriBayit פותרת בדיוק את הרדיפה אחרי התשלומים: במקום אקסל, היא קוראת את דף הבנק ומזהה אוטומטית מי שילם.\nהאתר: https://www.veribayit.com · דמו חינם 3 ימים (בלי כרטיס אשראי).\nאם בא לך, אשמח גם להראות לך איך זה עובד בשיחה קצרה — מה שנוח לך 🙏'}
+  {id:uid(),kind:'public',title:'אמפתיה → פתרון → בפרטי ⭐',body:'מכיר את התחושה הזו טוב מדי 😅 גם אני נשברתי מהרדיפה הזו, אז בניתי כלי שמתחבר לדף הבנק ומזהה לבד מי שילם. אם בא לך — אשלח לך פרטים בפרטי 🙂'},
+  {id:uid(),kind:'public',title:'קצרה במיוחד',body:'אני מרגיש אותך 🙏 יש פתרון שמתחבר לדף הבנק ומזהה אוטומטית מי שילם, בלי אקסל. רוצה שאשלח פרטים בפרטי?'},
+  {id:uid(),kind:'public',title:'סיפור אישי',body:'בדיוק בגלל זה בניתי תוכנה — אני גזבר בבניין של 70 דירות ונשבר לי. מתחברת לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד. אשמח לפרט בפרטי 🙏'},
+  {id:uid(),kind:'public',title:'ערך-קודם',body:'יש כלי שמתחבר לדף הבנק ומזהה לבד מי שילם — בלי אקסל ובלי שהכסף עובר דרך גורם שלישי עם עמלות. אם מעניין, שלח/י לי הודעה ואשמח לעזור.'},
+  {id:uid(),kind:'private',title:'הודעה בפרטי (DM)',body:'היי 🙂 ראיתי את הפוסט שלך על ניהול הוועד. אני גזבר בעצמי ובניתי כלי בשם VeriBayit שמתחבר לדף הבנק ומזהה לבד מי שילם (הכסף נשאר בחשבון הוועד, בלי עמלות סליקה). יש דמו חינם ל-3 ימים בלי כרטיס אשראי — רוצה שאשלח קישור?'},
+  {id:uid(),kind:'private',title:'📩 פרטי + דמו ⭐',body:'היי 🙂 ראיתי שכתבת על הקושי בניהול הוועד, אז כמו שהבטחתי — הכלי שבניתי נקרא VeriBayit. הוא מתחבר לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד (בלי גורם שלישי ובלי עמלות סליקה).\nאפשר פשוט לנסות בדמו חינם ל-3 ימים, בלי כרטיס אשראי 👇\nhttps://www.veribayit.com/demo\nאם יהיו שאלות — אני כאן 🙏'},
+  {id:uid(),kind:'private',title:'📩 פרטי — סיפור מייסד',body:'היי 🙂 אני עמית, גזבר בבניין של 70 דירות. נמאס לי מהרדיפה החודשית, אז בניתי כלי שעושה את זה לבד — מתחבר לדף הבנק ומזהה מי שילם.\nתרגיש/י חופשי להתרשם: https://www.veribayit.com (יש גם דמו חינם 3 ימים).\nשמח לעזור בכל שאלה, בלי שום התחייבות 🙏'},
+  {id:uid(),kind:'private',title:'📩 פרטי + ליווי',body:'נעים מאוד 🙂 כמו שכתבתי בקבוצה — VeriBayit פותרת בדיוק את הרדיפה אחרי התשלומים: במקום אקסל, היא קוראת את דף הבנק ומזהה אוטומטית מי שילם.\nהאתר: https://www.veribayit.com · דמו חינם 3 ימים (בלי כרטיס אשראי).\nאם בא לך, אשמח גם להראות לך איך זה עובד בשיחה קצרה — מה שנוח לך 🙏'}
 ];}
 function newProject(name,emoji,seed){
   return {id:'p_'+uid(),name:name,emoji:emoji||'📁',
@@ -152,16 +152,22 @@ const POST_STARTERS=[
   {label:'שאלה לקהילה',skel:'שאלה לכל הגזברים בקבוצה:\n\n[שאלה שמעוררת תגובות — איך אתם מנהלים את X?]\n\n[הקשר קצר + הזמנה לשתף]'},
 ];
 
+// אם לתגובה אין kind (נתונים ישנים) — מסיקים: 📩 / "פרטי" / DM → private, אחרת public.
+function inferKind(t){return /📩|בפרטי|\bDM\b/.test(t.title||'')?'private':'public';}
+function normalize(st){
+  (st.projects||[]).forEach(p=>(p.templates||[]).forEach(t=>{if(!t.kind)t.kind=inferKind(t);}));
+  return st;
+}
 let state=load();
 function load(){
   let r=null;try{r=JSON.parse(localStorage.getItem(KEY));}catch(e){}
-  if(!r) return freshState();
-  if(r.projects&&r.projects.length) return r;            // v2
+  if(!r) return normalize(freshState());
+  if(r.projects&&r.projects.length) return normalize(r);  // v2
   // מיגרציה מ-v1 (מבנה שטוח) → פרויקט VeriBayit
   const vb={id:'p_vb',name:'VeriBayit',emoji:'🏠',
     groups:r.groups||[],keywords:r.keywords||DEFAULT_KEYWORDS.slice(),
     templates:r.templates||vbReplies(),posts:r.posts||[],leads:r.leads||[],drafts:[]};
-  return {activeProjectId:'p_vb',projects:[vb],meta:r.meta||{lastReset:todayStr(),activeTab:'dash'}};
+  return normalize({activeProjectId:'p_vb',projects:[vb],meta:r.meta||{lastReset:todayStr(),activeTab:'dash'}});
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state));}
 function P(){return state.projects.find(p=>p.id===state.activeProjectId)||state.projects[0];}
@@ -428,18 +434,25 @@ function editLead(id){
 // ---- תגובות (templates) ----
 function vTemplates(){
   const p=P();
-  const items=p.templates.map(t=>`<div class="card"><div class="row spread"><b>${esc(t.title)}</b>
+  const tplCard=t=>`<div class="card"><div class="row spread"><b>${esc(t.title)}</b>
       <div class="row" style="gap:6px">
         <button class="btn sm" onclick="copyTpl('${t.id}')">📋 העתק</button>
         <button class="btn sm ghost" onclick="editTpl('${t.id}')">✏️</button>
         <button class="btn sm danger-o" onclick="delItem('templates','${t.id}')">🗑️</button></div></div>
-      <pre class="body">${esc(t.body)}</pre></div>`).join('');
+      <pre class="body">${esc(t.body)}</pre></div>`;
+  const section=(kind,icon,title,hint)=>{
+    const list=p.templates.filter(t=>(t.kind||'public')===kind);
+    return `<div class="row spread" style="margin:18px 0 8px">
+        <b style="font-size:17px">${icon} ${title} <span class="muted small">(${list.length})</span></b>
+        <button class="btn sm" onclick="editTpl(null,'${kind}')">➕ הוסף</button></div>
+      <div class="muted small" style="margin-bottom:10px">${hint}</div>
+      ${list.length?list.map(tplCard).join(''):'<div class="card empty">אין עדיין.</div>'}`;
+  };
   return `<div class="row spread"><b>תגובות מוכנות — ${esc(p.name)}</b>
-      <div class="row" style="gap:6px">
-        <button class="btn ghost" onclick="loadDefaultReplies()" title="מוסיף תגובות ברירת-המחדל של VeriBayit שחסרות">↻ שחזר ברירות מחדל</button>
-        <button class="btn" onclick="editTpl()">➕ הוסף תגובה</button>
-      </div></div>
-    <div class="help">✍️ אל תדביק כמו שזה — פר_סן משפט-שניים לפוסט הספציפי. תגובות 💬 לתגובה פומבית; 📩 להודעה בפרטי (עם לינק).</div>${items}`;
+      <button class="btn ghost" onclick="loadDefaultReplies()" title="מוסיף תגובות ברירת-המחדל של VeriBayit שחסרות">↻ שחזר ברירות מחדל</button></div>
+    <div class="help">✍️ אל תדביק כמו שזה — פר_סן משפט-שניים לפוסט הספציפי.</div>
+    ${section('public','💬','תגובות פומביות (בקבוצה)','להגיב בתגובה לפוסט — בלי לינק, מובילים ל"בפרטי".')}
+    ${section('private','📩','הודעות בפרטי (DM)','לשלוח בהודעה אישית — עם לינק לאתר / לדמו.')}`;
 }
 function loadDefaultReplies(){
   const p=P();const have=new Set(p.templates.map(t=>t.title));let added=0;
@@ -447,9 +460,10 @@ function loadDefaultReplies(){
   save();render();toast(added?added+' תגובות נוספו ✓':'הכל כבר קיים');
 }
 function copyTpl(id){const t=P().templates.find(x=>x.id===id);if(t)copyText(t.body);}
-function editTpl(id){
-  const p=P(),t=id?p.templates.find(x=>x.id===id):{};
+function editTpl(id,defKind){
+  const p=P(),t=id?p.templates.find(x=>x.id===id):{kind:defKind||'public'};
   showForm(id?'עריכת תגובה':'תגובה חדשה',[
+    {key:'kind',label:'סוג',type:'select',options:[{v:'public',l:'💬 פומבית (בקבוצה)'},{v:'private',l:'📩 פרטי (DM)'}],def:'public'},
     {key:'title',label:'כותרת',ph:'תגובה אמפתית'},{key:'body',label:'תוכן',type:'textarea',rows:5}
   ],t,o=>{if(!o.title){toast('צריך כותרת');return;}if(id)Object.assign(t,o);else p.templates.push({id:uid(),...o});save();render();});
 }
