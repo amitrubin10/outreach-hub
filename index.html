@@ -128,7 +128,10 @@ function vbReplies(){return [
   {id:uid(),title:'קצרה במיוחד',body:'אני מרגיש אותך 🙏 יש פתרון שמתחבר לדף הבנק ומזהה אוטומטית מי שילם, בלי אקסל. רוצה שאשלח פרטים בפרטי?'},
   {id:uid(),title:'סיפור אישי',body:'בדיוק בגלל זה בניתי תוכנה — אני גזבר בבניין של 70 דירות ונשבר לי. מתחברת לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד. אשמח לפרט בפרטי 🙏'},
   {id:uid(),title:'ערך-קודם',body:'יש כלי שמתחבר לדף הבנק ומזהה לבד מי שילם — בלי אקסל ובלי שהכסף עובר דרך גורם שלישי עם עמלות. אם מעניין, שלח/י לי הודעה ואשמח לעזור.'},
-  {id:uid(),title:'הודעה בפרטי (DM)',body:'היי 🙂 ראיתי את הפוסט שלך על ניהול הוועד. אני גזבר בעצמי ובניתי כלי בשם VeriBayit שמתחבר לדף הבנק ומזהה לבד מי שילם (הכסף נשאר בחשבון הוועד, בלי עמלות סליקה). יש דמו חינם ל-3 ימים בלי כרטיס אשראי — רוצה שאשלח קישור?'}
+  {id:uid(),title:'הודעה בפרטי (DM)',body:'היי 🙂 ראיתי את הפוסט שלך על ניהול הוועד. אני גזבר בעצמי ובניתי כלי בשם VeriBayit שמתחבר לדף הבנק ומזהה לבד מי שילם (הכסף נשאר בחשבון הוועד, בלי עמלות סליקה). יש דמו חינם ל-3 ימים בלי כרטיס אשראי — רוצה שאשלח קישור?'},
+  {id:uid(),title:'📩 פרטי + דמו ⭐',body:'היי 🙂 ראיתי שכתבת על הקושי בניהול הוועד, אז כמו שהבטחתי — הכלי שבניתי נקרא VeriBayit. הוא מתחבר לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד (בלי גורם שלישי ובלי עמלות סליקה).\nאפשר פשוט לנסות בדמו חינם ל-3 ימים, בלי כרטיס אשראי 👇\nhttps://www.veribayit.com/demo\nאם יהיו שאלות — אני כאן 🙏'},
+  {id:uid(),title:'📩 פרטי — סיפור מייסד',body:'היי 🙂 אני עמית, גזבר בבניין של 70 דירות. נמאס לי מהרדיפה החודשית, אז בניתי כלי שעושה את זה לבד — מתחבר לדף הבנק ומזהה מי שילם.\nתרגיש/י חופשי להתרשם: https://www.veribayit.com (יש גם דמו חינם 3 ימים).\nשמח לעזור בכל שאלה, בלי שום התחייבות 🙏'},
+  {id:uid(),title:'📩 פרטי + ליווי',body:'נעים מאוד 🙂 כמו שכתבתי בקבוצה — VeriBayit פותרת בדיוק את הרדיפה אחרי התשלומים: במקום אקסל, היא קוראת את דף הבנק ומזהה אוטומטית מי שילם.\nהאתר: https://www.veribayit.com · דמו חינם 3 ימים (בלי כרטיס אשראי).\nאם בא לך, אשמח גם להראות לך איך זה עובד בשיחה קצרה — מה שנוח לך 🙏'}
 ];}
 function newProject(name,emoji,seed){
   return {id:'p_'+uid(),name:name,emoji:emoji||'📁',
@@ -431,8 +434,17 @@ function vTemplates(){
         <button class="btn sm ghost" onclick="editTpl('${t.id}')">✏️</button>
         <button class="btn sm danger-o" onclick="delItem('templates','${t.id}')">🗑️</button></div></div>
       <pre class="body">${esc(t.body)}</pre></div>`).join('');
-  return `<div class="row spread"><b>תגובות מוכנות — ${esc(p.name)}</b><button class="btn" onclick="editTpl()">➕ הוסף תגובה</button></div>
-    <div class="help">✍️ אל תדביק כמו שזה — פר_סן משפט-שניים לפוסט הספציפי, והשאר את הקישור לפרטי. אמפתיה אישית מנצחת.</div>${items}`;
+  return `<div class="row spread"><b>תגובות מוכנות — ${esc(p.name)}</b>
+      <div class="row" style="gap:6px">
+        <button class="btn ghost" onclick="loadDefaultReplies()" title="מוסיף תגובות ברירת-המחדל של VeriBayit שחסרות">↻ שחזר ברירות מחדל</button>
+        <button class="btn" onclick="editTpl()">➕ הוסף תגובה</button>
+      </div></div>
+    <div class="help">✍️ אל תדביק כמו שזה — פר_סן משפט-שניים לפוסט הספציפי. תגובות 💬 לתגובה פומבית; 📩 להודעה בפרטי (עם לינק).</div>${items}`;
+}
+function loadDefaultReplies(){
+  const p=P();const have=new Set(p.templates.map(t=>t.title));let added=0;
+  vbReplies().forEach(d=>{if(!have.has(d.title)){p.templates.push(d);added++;}});
+  save();render();toast(added?added+' תגובות נוספו ✓':'הכל כבר קיים');
 }
 function copyTpl(id){const t=P().templates.find(x=>x.id===id);if(t)copyText(t.body);}
 function editTpl(id){
