@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מרכז שיווק בקבוצות · רב-פרויקטי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1220; --panel:#111a2e; --panel-2:#16233d; --card:#0f1a30;
+    --border:#22304d; --text:#e6edf7; --muted:#8aa0c2;
+    --accent:#60a5fa; --accent2:#7ca7ff; --cyan:#22d3ee;
+    --success:#34d399; --warn:#f59e0b; --danger:#f87171; --purple:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,rgba(96,165,250,.10),transparent),var(--bg);
+    color:var(--text);font-family:Heebo,system-ui,Arial,sans-serif;font-size:15px;line-height:1.5;padding-bottom:40px}
+  a{color:var(--accent2);text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+  header.top{display:flex;align-items:center;gap:12px;padding:18px 0 6px;flex-wrap:wrap}
+  .logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--cyan));
+    display:flex;align-items:center;justify-content:center;font-size:22px}
+  .brand{font-weight:800;font-size:20px}
+  .brand small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+  .pjtbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 4px;padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+  .pjt{background:var(--panel-2);color:var(--text);border:1px solid var(--border);padding:8px 16px;border-radius:999px;
+    font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+  .pjt:hover{background:rgba(96,165,250,.10)}
+  .pjt.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:var(--accent);color:#06122a}
+  .pjt.add{background:transparent;color:var(--muted);font-weight:600;border-style:dashed}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 18px;border-bottom:1px solid var(--border);padding-bottom:10px}
+  .tab{background:var(--panel-2);color:var(--text);border:1px solid var(--border);padding:9px 14px;border-radius:10px;
+    font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+  .tab:hover{background:rgba(96,165,250,.10)}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#06122a}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .spread{justify-content:space-between}
+  .grid{display:grid;gap:12px}
+  @media(min-width:680px){.grid.k2{grid-template-columns:1fr 1fr}.grid.k4{grid-template-columns:repeat(4,1fr)}}
+  .btn{background:var(--accent);color:#06122a;border:none;padding:9px 15px;border-radius:9px;font-family:inherit;
+    font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .btn.ghost:hover{background:var(--panel-2)}
+  .btn.sm{padding:5px 11px;font-size:12px;border-radius:8px}
+  .btn.success{background:var(--success)} .btn.warn{background:var(--warn)}
+  .btn.danger-o{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+  .chip{display:inline-flex;align-items:center;gap:5px;background:var(--panel-2);border:1px solid var(--border);
+    border-radius:999px;padding:4px 11px;font-size:12px;cursor:pointer;transition:.15s;font-weight:600}
+  .chip:hover{background:rgba(96,165,250,.12);border-color:var(--accent)}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+  .b-todo{background:rgba(245,158,11,.15);color:var(--warn)}
+  .b-done{background:rgba(52,211,153,.15);color:var(--success)}
+  .b-irr{background:rgba(138,160,194,.15);color:var(--muted)}
+  .b-new{background:rgba(96,165,250,.15);color:var(--accent2)}
+  .b-dm{background:rgba(167,139,250,.15);color:var(--purple)}
+  .b-demo{background:rgba(34,211,238,.15);color:var(--cyan)}
+  .b-cust{background:rgba(52,211,153,.18);color:var(--success)}
+  .b-lost{background:rgba(248,113,113,.13);color:var(--danger)}
+  .b-idea{background:rgba(167,139,250,.15);color:var(--purple)}
+  .b-draft{background:rgba(245,158,11,.15);color:var(--warn)}
+  .b-pub{background:rgba(52,211,153,.15);color:var(--success)}
+  .pri-high{color:var(--danger)} .pri-med{color:var(--warn)} .pri-low{color:var(--muted)}
+  input,textarea,select{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;
+    color:var(--text);font-family:inherit;font-size:14px;padding:9px 11px}
+  textarea{min-height:90px;resize:vertical}
+  label.fl{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+  .muted{color:var(--muted)} .small{font-size:12px}
+  .kpi{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+  .kpi .v{font-size:26px;font-weight:800} .kpi .l{font-size:12px;color:var(--muted);margin-top:3px}
+  .bar{height:10px;background:var(--panel-2);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan))}
+  .empty{text-align:center;color:var(--muted);padding:28px;font-size:14px}
+  .grp-rules{font-size:12px;color:var(--warn);margin-top:6px}
+  .list-item{border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:10px;background:var(--panel)}
+  .ov{position:fixed;inset:0;background:rgba(3,8,20,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .ov.on{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:92vh;
+    overflow:auto;padding:20px}
+  .modal h3{margin:0 0 6px}
+  .x{background:transparent;border:none;color:var(--muted);font-size:24px;cursor:pointer}
+  .hr{height:1px;background:var(--border);margin:14px 0}
+  .tag-x{margin-inline-start:4px;color:var(--danger);font-weight:800;cursor:pointer}
+  .help{background:rgba(96,165,250,.07);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:14px}
+  .reply{border:1px solid var(--border);border-radius:11px;padding:11px;margin-bottom:8px;background:var(--panel)}
+  pre.body{white-space:pre-wrap;font-family:inherit;font-size:13px;color:var(--muted);margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">🎯</div>
+    <div class="brand">מרכז שיווק בקבוצות <small>רב-פרויקטי · כלי אישי · נשמר במחשב הזה</small></div>
+  </header>
+
+  <div id="pjtbar"></div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-t="dash">📊 דשבורד</button>
+    <button class="tab" data-t="groups">👥 קבוצות</button>
+    <button class="tab" data-t="posts">📌 פוסטים</button>
+    <button class="tab" data-t="leads">👤 לידים</button>
+    <button class="tab" data-t="templates">💬 תגובות</button>
+    <button class="tab" data-t="studio">✍️ סטודיו פוסטים</button>
+    <button class="tab" data-t="backup">⚙️ הגדרות</button>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+
+<script>
+// ============================================================
+// מרכז שיווק בקבוצות — רב-פרויקטי. כלי אישי, vanilla JS, localStorage.
+// כל פרויקט מחזיק: קבוצות · מילות חיפוש · תגובות · פוסטים · לידים · טיוטות.
+// ============================================================
+const KEY='vb_outreach_hub_v1';
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const DEFAULT_KEYWORDS=['דמי ועד','רודף אחרי','רודפת אחרי','מי שילם','גזבר','ניהול ועד','אקסל ועד','ועד בית'];
+function vbReplies(){return [
+  {id:uid(),title:'אמפתיה → פתרון → בפרטי ⭐',body:'מכיר את התחושה הזו טוב מדי 😅 גם אני נשברתי מהרדיפה הזו, אז בניתי כלי שמתחבר לדף הבנק ומזהה לבד מי שילם. אם בא לך — אשלח לך פרטים בפרטי 🙂'},
+  {id:uid(),title:'קצרה במיוחד',body:'אני מרגיש אותך 🙏 יש פתרון שמתחבר לדף הבנק ומזהה אוטומטית מי שילם, בלי אקסל. רוצה שאשלח פרטים בפרטי?'},
+  {id:uid(),title:'סיפור אישי',body:'בדיוק בגלל זה בניתי תוכנה — אני גזבר בבניין של 70 דירות ונשבר לי. מתחברת לדף הבנק ומזהה לבד מי שילם, והכסף נשאר בחשבון הוועד. אשמח לפרט בפרטי 🙏'},
+  {id:uid(),title:'ערך-קודם',body:'יש כלי שמתחבר לדף הבנק ומזהה לבד מי שילם — בלי אקסל ובלי שהכסף עובר דרך גורם שלישי עם עמלות. אם מעניין, שלח/י לי הודעה ואשמח לעזור.'},
+  {id:uid(),title:'הודעה בפרטי (DM)',body:'היי 🙂 ראיתי את הפוסט שלך על ניהול הוועד. אני גזבר בעצמי ובניתי כלי בשם VeriBayit שמתחבר לדף הבנק ומזהה לבד מי שילם (הכסף נשאר בחשבון הוועד, בלי עמלות סליקה). יש דמו חינם ל-3 ימים בלי כרטיס אשראי — רוצה שאשלח קישור?'}
+];}
+function newProject(name,emoji,seed){
+  return {id:'p_'+uid(),name:name,emoji:emoji||'📁',
+    groups:[],keywords:seed?DEFAULT_KEYWORDS.slice():[],templates:seed?vbReplies():[],
+    posts:[],leads:[],drafts:[]};
+}
+function freshState(){
+  const vb=newProject('VeriBayit','🏠',true);vb.id='p_vb';
+  return {activeProjectId:'p_vb',projects:[vb],meta:{lastReset:todayStr(),activeTab:'dash'}};
+}
+
+// רעיונות-פתיחה לסטודיו (מסגרות תוכן גנריות)
+const POST_STARTERS=[
+  {label:'סיפור אישי',skel:'לפני כמה חודשים קרה לי משהו שלא ציפיתי לו.\n\n[תאר את הרגע / השיחה]\n\nוזה מה שזה גרם לי להבין:\n\n[התובנה + איך זה מתחבר למוצר]\n\nנשמח שתכירו 👇'},
+  {label:'בעיה → פתרון',skel:'אתם מכירים את התחושה ש...?\n\n[תאר את הכאב בצורה שכולם מזדהים]\n\nבדיוק בשביל זה יצרתי...\n\n[הפתרון, קצר וברור]\n\n[קריאה לפעולה עדינה]'},
+  {label:'לפני / אחרי',skel:'פעם זה לקח לי שעות. היום זה לוקח דקות.\n\nלפני: [המצב הישן]\n\nאחרי: [המצב החדש עם המוצר]\n\n[CTA]'},
+  {label:'טיפ מקצועי',skel:'טיפ לכל מי שמנהל ועד בית 👇\n\n[הטיפ — שווה ערך גם בלי המוצר]\n\nואם בא לכם לעשות את זה אוטומטית — [הקשר עדין].'},
+  {label:'שאלה לקהילה',skel:'שאלה לכל הגזברים בקבוצה:\n\n[שאלה שמעוררת תגובות — איך אתם מנהלים את X?]\n\n[הקשר קצר + הזמנה לשתף]'},
+];
+
+let state=load();
+function load(){
+  let r=null;try{r=JSON.parse(localStorage.getItem(KEY));}catch(e){}
+  if(!r) return freshState();
+  if(r.projects&&r.projects.length) return r;            // v2
+  // מיגרציה מ-v1 (מבנה שטוח) → פרויקט VeriBayit
+  const vb={id:'p_vb',name:'VeriBayit',emoji:'🏠',
+    groups:r.groups||[],keywords:r.keywords||DEFAULT_KEYWORDS.slice(),
+    templates:r.templates||vbReplies(),posts:r.posts||[],leads:r.leads||[],drafts:[]};
+  return {activeProjectId:'p_vb',projects:[vb],meta:r.meta||{lastReset:todayStr(),activeTab:'dash'}};
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function P(){return state.projects.find(p=>p.id===state.activeProjectId)||state.projects[0];}
+
+function dailyReset(){
+  if(state.meta.lastReset!==todayStr()){
+    state.projects.forEach(p=>p.groups.forEach(g=>g.checkedToday=false));
+    state.meta.lastReset=todayStr();save();
+  }
+}
+
+// ---------- עזרי FB ----------
+function normUrl(u){return (u||'').trim().replace(/\/+$/,'');}
+function groupSearchUrl(g,kw){const base=normUrl(g.url);return base?base+'/search/?q='+encodeURIComponent(kw):'#';}
+
+// ---------- העתקה ----------
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(t).then(()=>toast('הועתק ללוח ✓')).catch(()=>fallbackCopy(t));
+  else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('הועתק ללוח ✓');}catch(e){toast('העתקה נכשלה — סמן ידנית');}
+  document.body.removeChild(ta);
+}
+function toast(m){
+  const t=document.createElement('div');t.textContent=m;
+  t.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--success);color:#06122a;padding:10px 18px;border-radius:10px;font-weight:700;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.4)';
+  document.body.appendChild(t);setTimeout(()=>t.remove(),1700);
+}
+
+// ---------- מודל גנרי ----------
+function showForm(title,fields,values,onSubmit){
+  const v=values||{};
+  const inputs=fields.map(f=>{
+    const val=v[f.key]!=null?v[f.key]:(f.def||'');
+    if(f.type==='textarea')return `<label class="fl">${f.label}</label><textarea data-k="${f.key}" ${f.rows?`style="min-height:${f.rows*22}px"`:''}>${esc(val)}</textarea>`;
+    if(f.type==='select'){const opts=f.options.map(o=>`<option value="${o.v}" ${o.v===val?'selected':''}>${o.l}</option>`).join('');
+      return `<label class="fl">${f.label}</label><select data-k="${f.key}">${opts}</select>`;}
+    return `<label class="fl">${f.label}</label><input data-k="${f.key}" type="${f.type||'text'}" value="${esc(val)}" placeholder="${f.ph||''}">`;
+  }).join('');
+  document.getElementById('modal').innerHTML=`
+    <div class="row spread"><h3>${esc(title)}</h3><button class="x" onclick="closeModal()">&times;</button></div>
+    ${inputs}<div class="hr"></div>
+    <div class="row spread"><button class="btn ghost" onclick="closeModal()">ביטול</button><button class="btn" id="frmSave">שמירה</button></div>`;
+  document.getElementById('ov').classList.add('on');
+  document.getElementById('frmSave').onclick=()=>{const obj={};document.querySelectorAll('#modal [data-k]').forEach(el=>obj[el.dataset.k]=el.value.trim());onSubmit(obj);closeModal();};
+}
+function closeModal(){document.getElementById('ov').classList.remove('on');}
+
+// ---------- סטטוסים ----------
+const POST_ST={todo:['לטיפול','b-todo'],replied:['הגבתי','b-done'],irrelevant:['לא רלוונטי','b-irr']};
+const LEAD_ST={new:['פנייה ראשונה','b-new'],dm:['בפרטי','b-dm'],demo:['דמו','b-demo'],customer:['לקוח','b-cust'],lost:['אבוד','b-lost']};
+const DRAFT_ST={idea:['רעיון','b-idea'],draft:['טיוטה','b-draft'],published:['פורסם','b-pub']};
+const PRI={high:['גבוהה','pri-high'],med:['בינונית','pri-med'],low:['נמוכה','pri-low']};
+function prioVal(g){return {high:3,med:2,low:1}[g.priority||'med'];}
+function gName(id){const g=P().groups.find(x=>x.id===id);return g?g.name:'—';}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render(){
+  dailyReset();
+  // בר פרויקטים
+  document.getElementById('pjtbar').innerHTML=
+    state.projects.map(p=>`<button class="pjt ${p.id===state.activeProjectId?'active':''}" onclick="setProject('${p.id}')">${p.emoji||'📁'} ${esc(p.name)}</button>`).join('')
+    +`<button class="pjt add" onclick="addProject()">➕ פרויקט</button>`;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.t===state.meta.activeTab));
+  document.getElementById('content').innerHTML=
+    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,studio:vStudio,backup:vBackup}[state.meta.activeTab]||vDash)();
+}
+
+// ---- פרויקטים ----
+function setProject(id){state.activeProjectId=id;state.meta.activeTab='groups';save();render();}
+function addProject(){
+  showForm('פרויקט חדש',[
+    {key:'emoji',label:'אייקון',ph:'📁',def:'📁'},
+    {key:'name',label:'שם הפרויקט',ph:'שם התוכנה / המוצר'}
+  ],{},o=>{
+    if(!o.name){toast('צריך שם פרויקט');return;}
+    const p=newProject(o.name,o.emoji||'📁',false);state.projects.push(p);
+    state.activeProjectId=p.id;state.meta.activeTab='groups';save();render();
+  });
+}
+function editProject(id){
+  const p=state.projects.find(x=>x.id===id);
+  showForm('עריכת פרויקט',[{key:'emoji',label:'אייקון'},{key:'name',label:'שם'}],p,o=>{
+    if(o.name)p.name=o.name; if(o.emoji)p.emoji=o.emoji; save();render();
+  });
+}
+function delProject(id){
+  if(state.projects.length<=1){toast('חייב להישאר פרויקט אחד לפחות');return;}
+  if(confirm('למחוק את הפרויקט וכל הנתונים שלו? פעולה בלתי הפיכה.')){
+    state.projects=state.projects.filter(p=>p.id!==id);
+    if(state.activeProjectId===id)state.activeProjectId=state.projects[0].id;
+    save();render();
+  }
+}
+
+// ---- דשבורד ----
+function vDash(){
+  const p=P(),total=p.groups.length,checked=p.groups.filter(g=>g.checkedToday).length;
+  const pct=total?Math.round(checked/total*100):0;
+  const todo=p.posts.filter(x=>x.status==='todo').length;
+  const replied=p.posts.filter(x=>x.status==='replied').length;
+  const customers=p.leads.filter(l=>l.status==='customer').length;
+  const activeLeads=p.leads.filter(l=>['new','dm','demo'].includes(l.status)).length;
+  const pending=p.groups.filter(g=>!g.checkedToday).sort((a,b)=>prioVal(b)-prioVal(a))
+    .map(g=>`<a class="chip" href="${esc(normUrl(g.url))}" target="_blank">🔗 ${esc(g.name)}</a>`).join(' ')
+    ||'<span class="muted">כל הקבוצות נבדקו היום 🎉</span>';
+  return `
+  <div class="help">💡 <b>${esc(p.emoji)} ${esc(p.name)}</b> · שגרה יומית: עבור על הקבוצות → חפש מילות מפתח → הגב אישית (תגובה בלשונית 💬) → סמן "נבדקה". זכור: אמפתיה ובפרטי, בלי ספאם.</div>
+  <div class="grid k4">
+    <div class="kpi"><div class="v">${checked}/${total}</div><div class="l">קבוצות שנבדקו היום</div></div>
+    <div class="kpi"><div class="v" style="color:var(--warn)">${todo}</div><div class="l">פוסטים לטיפול</div></div>
+    <div class="kpi"><div class="v" style="color:var(--accent2)">${activeLeads}</div><div class="l">לידים פעילים</div></div>
+    <div class="kpi"><div class="v" style="color:var(--success)">${customers}</div><div class="l">לקוחות 🎉</div></div>
+  </div>
+  <div class="card">
+    <div class="row spread"><b>התקדמות יומית</b><span class="muted small">${pct}%</span></div>
+    <div class="bar" style="margin-top:8px"><i style="width:${pct}%"></i></div>
+    <div style="margin-top:12px"><b class="small muted">קבוצות שטרם נבדקו היום:</b><div style="margin-top:8px">${pending}</div></div>
+  </div>
+  <div class="card row" style="gap:8px">
+    <button class="btn" onclick="go('groups')">👥 לקבוצות</button>
+    <button class="btn ghost" onclick="go('posts')">📌 פוסטים (${p.posts.length})</button>
+    <button class="btn ghost" onclick="go('studio')">✍️ סטודיו (${p.drafts.length})</button>
+    <span class="muted small">הגבת ל-<b style="color:var(--success)">${replied}</b> פוסטים</span>
+  </div>`;
+}
+
+// ---- קבוצות ----
+let groupSort='priority';
+function vGroups(){
+  const p=P();
+  const quick=p.templates.length?`<div class="card"><div class="row spread"><b>💬 תגובות מהירות</b><button class="btn sm ghost" onclick="go('templates')">נהל</button></div>
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+      ${p.templates.map(t=>`<div class="row spread" style="gap:8px"><span class="small">${esc(t.title)}</span><button class="btn sm" onclick="copyTpl('${t.id}')">📋 העתק</button></div>`).join('')}
+    </div></div>`:'';
+  if(!p.groups.length) return quick+`
+    <div class="row spread"><b>הקבוצות של ${esc(p.name)}</b><button class="btn" onclick="editGroup()">➕ הוסף קבוצה</button></div>
+    <div class="card empty">עוד אין קבוצות בפרויקט הזה. לחץ "➕ הוסף קבוצה" והדבק שם + קישור לקבוצה בפייסבוק.</div>`;
+  let arr=[...p.groups];
+  if(groupSort==='priority')arr.sort((a,b)=>prioVal(b)-prioVal(a));
+  else arr.sort((a,b)=>(a.lastChecked||'').localeCompare(b.lastChecked||''));
+  const cards=arr.map(g=>{
+    const kws=p.keywords.map(k=>`<a class="chip" href="${groupSearchUrl(g,k)}" target="_blank" title="חפש בקבוצה">🔍 ${esc(k)}</a>`).join(' ');
+    const pr=PRI[g.priority||'med'];
+    return `<div class="card">
+      <div class="row spread">
+        <div><b style="font-size:16px">${esc(g.name)}</b>
+          <span class="small ${pr[1]}"> • עדיפות ${pr[0]}</span>
+          ${g.lastChecked?`<span class="muted small"> • נבדק: ${esc(g.lastChecked)}</span>`:''}</div>
+        <div class="row" style="gap:6px">
+          <a class="btn sm" href="${esc(normUrl(g.url))}" target="_blank">🔗 פתח קבוצה</a>
+          <button class="btn sm ${g.checkedToday?'success':'ghost'}" onclick="toggleChecked('${g.id}')">${g.checkedToday?'✓ נבדקה היום':'סמן כנבדקה'}</button>
+          <button class="btn sm ghost" onclick="editGroup('${g.id}')">✏️</button>
+          <button class="btn sm danger-o" onclick="delItem('groups','${g.id}')">🗑️</button>
+        </div>
+      </div>
+      ${g.rules?`<div class="grp-rules">⚠️ ${esc(g.rules)}</div>`:''}
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${kws}</div>
+    </div>`;
+  }).join('');
+  return quick+`
+    <div class="row spread"><b>הקבוצות של ${esc(p.name)} (${p.groups.length})</b>
+      <div class="row" style="gap:6px">
+        <select style="width:auto" onchange="groupSort=this.value;render()">
+          <option value="priority" ${groupSort==='priority'?'selected':''}>מיון: עדיפות</option>
+          <option value="oldest" ${groupSort==='oldest'?'selected':''}>מיון: הכי מזמן לא נבדקה</option>
+        </select>
+        <button class="btn" onclick="editGroup()">➕ הוסף קבוצה</button>
+      </div></div>
+    <div class="help">🔍 לחיצה על מילת חיפוש פותחת את החיפוש <b>בתוך הקבוצה</b>. עריכת מילות חיפוש — לשונית ⚙️ הגדרות.</div>
+    ${cards}`;
+}
+function editGroup(id){
+  const p=P(),g=id?p.groups.find(x=>x.id===id):{};
+  showForm(id?'עריכת קבוצה':'קבוצה חדשה',[
+    {key:'name',label:'שם הקבוצה',ph:'ועדי בתים בישראל'},
+    {key:'url',label:'קישור לקבוצה (URL)',type:'url',ph:'https://www.facebook.com/groups/...'},
+    {key:'priority',label:'עדיפות',type:'select',options:[{v:'high',l:'גבוהה'},{v:'med',l:'בינונית'},{v:'low',l:'נמוכה'}],def:'med'},
+    {key:'rules',label:'חוקים / הערות (אופציונלי)',type:'textarea',ph:'דורשת אישור אדמין / פרסום רק בימי ה׳'}
+  ],g,o=>{
+    if(!o.name){toast('צריך שם קבוצה');return;}
+    if(id)Object.assign(g,o); else p.groups.push({id:uid(),checkedToday:false,lastChecked:'',...o});
+    save();render();
+  });
+}
+function toggleChecked(id){const g=P().groups.find(x=>x.id===id);if(!g)return;g.checkedToday=!g.checkedToday;if(g.checkedToday)g.lastChecked=todayStr();save();render();}
+
+// ---- פוסטים ----
+let postFilter='all';
+function vPosts(){
+  const p=P();
+  const arr=p.posts.filter(x=>postFilter==='all'||x.status===postFilter).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const items=arr.length?arr.map(x=>{
+    const st=POST_ST[x.status]||POST_ST.todo;
+    return `<div class="list-item"><div class="row spread">
+        <div><span class="badge ${st[1]}">${st[0]}</span><span class="muted small"> ${esc(gName(x.groupId))} • ${esc(x.date||'')}</span></div>
+        <div class="row" style="gap:6px">
+          ${x.url?`<a class="btn sm" href="${esc(x.url)}" target="_blank">🔗 פוסט</a>`:''}
+          ${x.status!=='replied'?`<button class="btn sm success" onclick="setPost('${x.id}','replied')">✓ הגבתי</button>`:`<button class="btn sm ghost" onclick="setPost('${x.id}','todo')">↩ לטיפול</button>`}
+          <button class="btn sm ghost" onclick="editPost('${x.id}')">✏️</button>
+          <button class="btn sm danger-o" onclick="delItem('posts','${x.id}')">🗑️</button>
+        </div></div>
+      ${x.snippet?`<div class="small" style="margin-top:8px">${esc(x.snippet)}</div>`:''}
+      ${x.notes?`<div class="muted small" style="margin-top:6px">📝 ${esc(x.notes)}</div>`:''}</div>`;
+  }).join(''):'<div class="card empty">אין פוסטים בסינון הזה.</div>';
+  const f=(v,l)=>`<button class="chip" style="${postFilter===v?'background:var(--accent);color:#06122a;border-color:var(--accent)':''}" onclick="postFilter='${v}';render()">${l}</button>`;
+  return `<div class="row spread"><b>מעקב פוסטים (${p.posts.length})</b><button class="btn" onclick="editPost()">➕ הוסף פוסט</button></div>
+    <div class="row" style="gap:6px;margin:10px 0 14px">${f('all','הכל')}${f('todo','לטיפול')}${f('replied','הגבתי')}${f('irrelevant','לא רלוונטי')}</div>${items}`;
+}
+function editPost(id){
+  const p=P(),x=id?p.posts.find(y=>y.id===id):{date:todayStr(),status:'todo'};
+  const gopts=[{v:'',l:'— ללא —'}].concat(p.groups.map(g=>({v:g.id,l:g.name})));
+  showForm(id?'עריכת פוסט':'פוסט חדש',[
+    {key:'url',label:'קישור לפוסט',type:'url',ph:'הדבק קישור'},
+    {key:'groupId',label:'קבוצה',type:'select',options:gopts},
+    {key:'snippet',label:'ציטוט / תקציר',type:'textarea',ph:'"מרגיש לי שאני רודפת אחרי דיירים..."'},
+    {key:'status',label:'סטטוס',type:'select',options:[{v:'todo',l:'לטיפול'},{v:'replied',l:'הגבתי'},{v:'irrelevant',l:'לא רלוונטי'}],def:'todo'},
+    {key:'notes',label:'הערות',type:'textarea'},
+    {key:'date',label:'תאריך',type:'date',def:todayStr()}
+  ],x,o=>{if(id)Object.assign(x,o);else p.posts.push({id:uid(),...o});save();render();});
+}
+function setPost(id,st){const x=P().posts.find(y=>y.id===id);if(x){x.status=st;save();render();}}
+
+// ---- לידים ----
+let leadFilter='all';
+function vLeads(){
+  const p=P();
+  const arr=p.leads.filter(l=>leadFilter==='all'||l.status===leadFilter).sort((a,b)=>(a.followUp||'9999').localeCompare(b.followUp||'9999'));
+  const items=arr.length?arr.map(l=>{
+    const st=LEAD_ST[l.status]||LEAD_ST.new;
+    const due=l.followUp&&l.followUp<=todayStr()&&!['customer','lost'].includes(l.status);
+    return `<div class="list-item"><div class="row spread">
+        <div><b>${esc(l.name||'ליד')}</b> <span class="badge ${st[1]}">${st[0]}</span>
+          ${l.followUp?`<span class="small ${due?'pri-high':'muted'}"> • מעקב: ${esc(l.followUp)}${due?' ⏰':''}</span>`:''}
+          <div class="muted small">${esc(gName(l.groupId))}</div></div>
+        <div class="row" style="gap:6px">
+          ${l.link?`<a class="btn sm" href="${esc(l.link)}" target="_blank">🔗</a>`:''}
+          <button class="btn sm ghost" onclick="editLead('${l.id}')">✏️</button>
+          <button class="btn sm danger-o" onclick="delItem('leads','${l.id}')">🗑️</button>
+        </div></div>
+      ${l.notes?`<div class="muted small" style="margin-top:6px">📝 ${esc(l.notes)}</div>`:''}</div>`;
+  }).join(''):'<div class="card empty">אין לידים בסינון הזה.</div>';
+  const f=(v,l)=>`<button class="chip" style="${leadFilter===v?'background:var(--accent);color:#06122a;border-color:var(--accent)':''}" onclick="leadFilter='${v}';render()">${l}</button>`;
+  return `<div class="row spread"><b>לידים (${p.leads.length})</b><button class="btn" onclick="editLead()">➕ הוסף ליד</button></div>
+    <div class="row" style="gap:6px;margin:10px 0 14px">${f('all','הכל')}${f('new','פנייה')}${f('dm','בפרטי')}${f('demo','דמו')}${f('customer','לקוח')}${f('lost','אבוד')}</div>${items}`;
+}
+function editLead(id){
+  const p=P(),l=id?p.leads.find(x=>x.id===id):{status:'new',date:todayStr()};
+  const gopts=[{v:'',l:'— ללא —'}].concat(p.groups.map(g=>({v:g.id,l:g.name})));
+  showForm(id?'עריכת ליד':'ליד חדש',[
+    {key:'name',label:'שם'},{key:'groupId',label:'קבוצה (מקור)',type:'select',options:gopts},
+    {key:'link',label:'קישור לפרופיל/פוסט',type:'url'},
+    {key:'status',label:'סטטוס',type:'select',options:[{v:'new',l:'פנייה ראשונה'},{v:'dm',l:'בפרטי'},{v:'demo',l:'דמו'},{v:'customer',l:'לקוח'},{v:'lost',l:'אבוד'}],def:'new'},
+    {key:'followUp',label:'תאריך מעקב חוזר',type:'date'},{key:'notes',label:'הערות',type:'textarea'}
+  ],l,o=>{if(!o.name){toast('צריך שם');return;}if(id)Object.assign(l,o);else p.leads.push({id:uid(),...o});save();render();});
+}
+
+// ---- תגובות (templates) ----
+function vTemplates(){
+  const p=P();
+  const items=p.templates.map(t=>`<div class="card"><div class="row spread"><b>${esc(t.title)}</b>
+      <div class="row" style="gap:6px">
+        <button class="btn sm" onclick="copyTpl('${t.id}')">📋 העתק</button>
+        <button class="btn sm ghost" onclick="editTpl('${t.id}')">✏️</button>
+        <button class="btn sm danger-o" onclick="delItem('templates','${t.id}')">🗑️</button></div></div>
+      <pre class="body">${esc(t.body)}</pre></div>`).join('');
+  return `<div class="row spread"><b>תגובות מוכנות — ${esc(p.name)}</b><button class="btn" onclick="editTpl()">➕ הוסף תגובה</button></div>
+    <div class="help">✍️ אל תדביק כמו שזה — פר_סן משפט-שניים לפוסט הספציפי, והשאר את הקישור לפרטי. אמפתיה אישית מנצחת.</div>${items}`;
+}
+function copyTpl(id){const t=P().templates.find(x=>x.id===id);if(t)copyText(t.body);}
+function editTpl(id){
+  const p=P(),t=id?p.templates.find(x=>x.id===id):{};
+  showForm(id?'עריכת תגובה':'תגובה חדשה',[
+    {key:'title',label:'כותרת',ph:'תגובה אמפתית'},{key:'body',label:'תוכן',type:'textarea',rows:5}
+  ],t,o=>{if(!o.title){toast('צריך כותרת');return;}if(id)Object.assign(t,o);else p.templates.push({id:uid(),...o});save();render();});
+}
+
+// ---- סטודיו פוסטים ----
+function vStudio(){
+  const p=P();
+  const starters=POST_STARTERS.map((s,i)=>`<button class="chip" onclick="newDraftFrom(${i})">💡 ${esc(s.label)}</button>`).join(' ');
+  const items=p.drafts.length?p.drafts.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(d=>{
+    const st=DRAFT_ST[d.status]||DRAFT_ST.idea;
+    return `<div class="card"><div class="row spread">
+        <div><b>${esc(d.title||'ללא כותרת')}</b> <span class="badge ${st[1]}">${st[0]}</span> <span class="muted small">${esc(d.date||'')}</span></div>
+        <div class="row" style="gap:6px">
+          <button class="btn sm" onclick="copyDraft('${d.id}')">📋 העתק</button>
+          <button class="btn sm ghost" onclick="editDraft('${d.id}')">✏️</button>
+          <button class="btn sm danger-o" onclick="delItem('drafts','${d.id}')">🗑️</button></div></div>
+      <pre class="body">${esc(d.body)}</pre></div>`;
+  }).join(''):'<div class="card empty">אין טיוטות. בחר "רעיון לפתיחה" למעלה, או "➕ פוסט חדש".</div>';
+  return `<div class="row spread"><b>סטודיו פוסטים — ${esc(p.name)}</b><button class="btn" onclick="editDraft()">➕ פוסט חדש</button></div>
+    <div class="card"><b class="small muted">💡 רעיונות לפתיחה (לחיצה יוצרת טיוטה עם שלד):</b>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${starters}</div></div>
+    ${items}`;
+}
+function newDraftFrom(i){
+  const s=POST_STARTERS[i];const p=P();
+  const d={id:uid(),title:s.label,body:s.skel,status:'draft',date:todayStr()};
+  p.drafts.push(d);save();editDraft(d.id);
+}
+function editDraft(id){
+  const p=P(),d=id?p.drafts.find(x=>x.id===id):{status:'idea',date:todayStr()};
+  showForm(id?'עריכת פוסט':'פוסט חדש',[
+    {key:'title',label:'כותרת פנימית',ph:'שם לזיהוי'},
+    {key:'body',label:'תוכן הפוסט',type:'textarea',rows:9},
+    {key:'status',label:'סטטוס',type:'select',options:[{v:'idea',l:'רעיון'},{v:'draft',l:'טיוטה'},{v:'published',l:'פורסם'}],def:'draft'},
+    {key:'date',label:'תאריך',type:'date',def:todayStr()}
+  ],d,o=>{if(id)Object.assign(d,o);else p.drafts.push({id:uid(),...o});save();render();});
+}
+function copyDraft(id){const d=P().drafts.find(x=>x.id===id);if(d)copyText(d.body);}
+
+// ---- הגדרות וגיבוי ----
+function vBackup(){
+  const p=P();
+  const tags=p.keywords.map((k,i)=>`<span class="chip">${esc(k)}<span class="tag-x" onclick="delKw(${i})">×</span></span>`).join(' ');
+  const pjs=state.projects.map(x=>`<div class="row spread list-item"><b>${esc(x.emoji)} ${esc(x.name)}</b>
+      <div class="row" style="gap:6px"><button class="btn sm ghost" onclick="editProject('${x.id}')">✏️</button>
+      <button class="btn sm danger-o" onclick="delProject('${x.id}')">🗑️</button></div></div>`).join('');
+  return `
+    <div class="card"><b>📁 פרויקטים</b>
+      <div class="muted small" style="margin:6px 0 10px">כל פרויקט מחזיק קבוצות/תגובות/לידים משלו. לחיצה על פרויקט בבר העליון מחליפה הקשר.</div>
+      ${pjs}<button class="btn" style="margin-top:8px" onclick="addProject()">➕ פרויקט חדש</button></div>
+    <div class="card"><b>🔍 מילות חיפוש — ${esc(p.name)}</b>
+      <div class="muted small" style="margin:6px 0 10px">מופיעות ככפתורי חיפוש בכל קבוצה של הפרויקט הזה.</div>
+      <div class="row" style="gap:6px">${tags||'<span class="muted small">אין עדיין</span>'}</div>
+      <div class="row" style="margin-top:12px;gap:6px"><input id="newKw" placeholder="מילת חיפוש חדשה" style="max-width:240px" onkeydown="if(event.key==='Enter')addKw()"><button class="btn" onclick="addKw()">הוסף</button></div></div>
+    <div class="card"><b>💾 גיבוי ושחזור (כל הפרויקטים)</b>
+      <div class="muted small" style="margin:6px 0 12px">הנתונים נשמרים רק בדפדפן הזה. ייצא גיבוי כדי לא לאבד / להעביר למכשיר אחר.</div>
+      <div class="row" style="gap:8px"><button class="btn" onclick="exportData()">⬇️ ייצוא גיבוי</button>
+        <button class="btn ghost" onclick="document.getElementById('imp').click()">⬆️ ייבוא גיבוי</button>
+        <input type="file" id="imp" accept="application/json" style="display:none" onchange="importData(this)"></div></div>`;
+}
+function addKw(){const el=document.getElementById('newKw');const v=el.value.trim();const p=P();if(v&&!p.keywords.includes(v)){p.keywords.push(v);save();render();}}
+function delKw(i){P().keywords.splice(i,1);save();render();}
+function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='outreach-backup-'+todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);}
+function importData(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);
+    if(d.projects&&d.projects.length){ state=d; }                 // גיבוי v2
+    else if(d.groups){ localStorage.setItem(KEY,r.result); state=load(); } // גיבוי v1 → מיגרציה
+    else throw 0;
+    save();render();toast('יובא בהצלחה ✓');
+  }catch(e){toast('קובץ לא תקין');}};
+  r.readAsText(f);inp.value='';
+}
+
+// ---- כללי ----
+function delItem(coll,id){if(confirm('למחוק?')){const p=P();p[coll]=p[coll].filter(x=>x.id!==id);save();render();}}
+function go(t){state.meta.activeTab=t;save();render();}
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)go(b.dataset.t);});
+document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')closeModal();});
+render();
+</script>
+</body>
+</html>

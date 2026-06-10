@@ -1,0 +1,11 @@
+# גיבויים שיוצאו מהכלי (מכילים נתוני קבוצות/לידים אישיים)
+*.json
+outreach-backup-*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*~
