@@ -85,7 +85,23 @@
   .tag-x{margin-inline-start:4px;color:var(--danger);font-weight:800;cursor:pointer}
   .help{background:rgba(96,165,250,.07);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:14px}
   .reply{border:1px solid var(--border);border-radius:11px;padding:11px;margin-bottom:8px;background:var(--panel)}
-  pre.body{white-space:pre-wrap;font-family:inherit;font-size:13px;color:var(--muted);margin:8px 0 0}
+  pre.body{white-space:pre-wrap;font-family:inherit;font-size:13px;color:var(--muted);margin:8px 0 0;overflow-wrap:anywhere;word-break:break-word}
+  /* ===== נייד (≤ 600px) — נוח לעבודה מהטלפון ===== */
+  @media(max-width:600px){
+    .wrap{padding:0 12px}
+    header.top{padding:14px 0 4px}
+    .brand{font-size:18px}
+    .grid.k4{grid-template-columns:1fr 1fr}      /* 2 KPIs בשורה במקום 4 */
+    .kpi{padding:11px} .kpi .v{font-size:22px}
+    .btn{padding:11px 15px}                        /* יעדי-מגע גדולים יותר לאצבע */
+    .btn.sm{padding:8px 12px;font-size:12px}
+    .tab{padding:9px 13px;font-size:13px}
+    .pjt{padding:8px 14px;font-size:13px}
+    .card{padding:13px}
+    /* גודל גופן 16px בשדות — מונע זום אוטומטי של iOS בלחיצה */
+    input,textarea,select{font-size:16px}
+    .modal{padding:16px}
+  }
 </style>
 </head>
 <body>
