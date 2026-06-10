@@ -86,6 +86,10 @@
   .help{background:rgba(96,165,250,.07);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:14px}
   .reply{border:1px solid var(--border);border-radius:11px;padding:11px;margin-bottom:8px;background:var(--panel)}
   pre.body{white-space:pre-wrap;font-family:inherit;font-size:13px;color:var(--muted);margin:8px 0 0;overflow-wrap:anywhere;word-break:break-word}
+  #syncbar:empty{display:none}
+  .syncon,.syncoff{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:600;padding:7px 12px;border-radius:10px;border:1px solid var(--border)}
+  .syncon{background:rgba(52,211,153,.08);color:var(--success)}
+  .syncoff{background:rgba(245,158,11,.06);color:var(--warn)}
   /* ===== נייד (≤ 600px) — נוח לעבודה מהטלפון ===== */
   @media(max-width:600px){
     .wrap{padding:0 12px}
@@ -112,6 +116,7 @@
   </header>
 
   <div id="pjtbar"></div>
+  <div id="syncbar"></div>
 
   <div class="tabs" id="tabs">
     <button class="tab" data-t="dash">📊 דשבורד</button>
@@ -218,7 +223,53 @@ function load(){
     templates:r.templates||vbReplies(),posts:r.posts||[],leads:r.leads||[],drafts:[]};
   return prep({activeProjectId:'p_vb',projects:[vb],meta:r.meta||{lastReset:todayStr(),activeTab:'dash'}});
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function saveLocal(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+function save(){ saveLocal(); cloudPush(); }
+
+// ===== סנכרון ענן (Supabase) — לקוח ה-SB נטען ע"י <script type="module"> בתחתית =====
+let cloudUser=null, _pushTimer=null;
+window.__cloudInit=async function(){
+  if(!window.__sb) return;
+  window.__sb.auth.onAuthStateChange((_e,session)=>{ cloudUser=session?session.user:null; renderSyncBar(); });
+  try{ const { data:{ session } }=await window.__sb.auth.getSession(); if(session){ cloudUser=session.user; await cloudPullOrSeed(); } }catch(e){}
+  renderSyncBar();
+};
+async function cloudPullOrSeed(){
+  if(!window.__sb||!cloudUser) return;
+  const { data, error }=await window.__sb.from('outreach_state').select('data').eq('user_id',cloudUser.id).maybeSingle();
+  if(error){ toast('שגיאת טעינה מהענן'); return; }
+  if(data && data.data && data.data.projects){ state=prep(data.data); saveLocal(); render(); toast('נטען מהענן ✓'); }
+  else { cloudPush(true); }   // הענן ריק → מזריקים את המצב המקומי
+}
+function cloudPush(immediate){
+  if(!window.__sb||!cloudUser) return;
+  clearTimeout(_pushTimer);
+  const doPush=async()=>{ try{ await window.__sb.from('outreach_state').upsert({user_id:cloudUser.id,data:state,updated_at:new Date().toISOString()}); }catch(e){} };
+  if(immediate){ doPush(); return; }
+  _pushTimer=setTimeout(doPush,800);
+}
+function cloudRefresh(){ cloudPullOrSeed(); }
+function openSyncLogin(){
+  showForm('התחברות לסנכרון (חשבון VeriBayit)',[
+    {key:'email',label:'מייל',type:'email'},{key:'password',label:'סיסמה',type:'password'}
+  ],{},async o=>{
+    if(!window.__sb){ toast('הסנכרון עוד נטען — נסה שוב בעוד רגע'); return; }
+    try{
+      const { error }=await window.__sb.auth.signInWithPassword({email:(o.email||'').trim().toLowerCase(),password:o.password||''});
+      if(error){ toast('התחברות נכשלה — בדוק מייל/סיסמה'); return; }
+      const { data:{ session } }=await window.__sb.auth.getSession();
+      cloudUser=session?session.user:null;
+      await cloudPullOrSeed(); renderSyncBar(); toast('מחובר ומסונכרן ✓');
+    }catch(e){ toast('שגיאה בהתחברות'); }
+  });
+}
+async function cloudLogout(){ try{ await window.__sb.auth.signOut(); }catch(e){} cloudUser=null; renderSyncBar(); toast('התנתקת — הנתונים נשארים מקומית'); }
+function renderSyncBar(){
+  const el=document.getElementById('syncbar'); if(!el) return;
+  el.innerHTML = cloudUser
+    ? `<div class="syncon">☁️ מסונכרן · <b>${esc(cloudUser.email||'')}</b> <button class="btn sm ghost" onclick="cloudRefresh()">↻ רענן</button> <button class="btn sm ghost" onclick="cloudLogout()">התנתק</button></div>`
+    : `<div class="syncoff">📴 מקומי בלבד (לא מסונכרן) <button class="btn sm" onclick="openSyncLogin()">☁️ התחבר לסנכרון</button></div>`;
+}
 function P(){return state.projects.find(p=>p.id===state.activeProjectId)||state.projects[0];}
 
 function dailyReset(){
@@ -282,6 +333,7 @@ function gName(id){const g=P().groups.find(x=>x.id===id);return g?g.name:'—';}
 // ============================================================
 function render(){
   dailyReset();
+  renderSyncBar();
   // בר פרויקטים
   document.getElementById('pjtbar').innerHTML=
     state.projects.map(p=>`<button class="pjt ${p.id===state.activeProjectId?'active':''}" onclick="setProject('${p.id}')">${p.emoji||'📁'} ${esc(p.name)}</button>`).join('')
@@ -599,6 +651,15 @@ function go(t){state.meta.activeTab=t;save();render();}
 document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)go(b.dataset.t);});
 document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')closeModal();});
 render();
+</script>
+<script type="module">
+  // טוען את לקוח Supabase (מיחזור פרויקט VeriBayit — anon key ציבורי, מוגן ב-RLS)
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  window.__sb = createClient(
+    'https://coyksxxnlaakcsuetwzz.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNveWtzeHhubGFha2NzdWV0d3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwOTg5OTYsImV4cCI6MjA5NDY3NDk5Nn0.42YTNX5R-cZDJd5mMQmuVnbzGPZmC5jxsS0jV_FbppU'
+  );
+  if (window.__cloudInit) window.__cloudInit();
 </script>
 </body>
 </html>
