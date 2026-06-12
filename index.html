@@ -250,18 +250,34 @@ function cloudPush(immediate){
 }
 function cloudRefresh(){ cloudPullOrSeed(); }
 function openSyncLogin(){
-  showForm('התחברות לסנכרון (חשבון VeriBayit)',[
-    {key:'email',label:'מייל',type:'email'},{key:'password',label:'סיסמה',type:'password'}
-  ],{},async o=>{
-    if(!window.__sb){ toast('הסנכרון עוד נטען — נסה שוב בעוד רגע'); return; }
-    try{
-      const { error }=await window.__sb.auth.signInWithPassword({email:(o.email||'').trim().toLowerCase(),password:o.password||''});
-      if(error){ toast('התחברות נכשלה — בדוק מייל/סיסמה'); return; }
-      const { data:{ session } }=await window.__sb.auth.getSession();
-      cloudUser=session?session.user:null;
-      await cloudPullOrSeed(); renderSyncBar(); toast('מחובר ומסונכרן ✓');
-    }catch(e){ toast('שגיאה בהתחברות'); }
-  });
+  document.getElementById('modal').innerHTML=`
+    <div class="row spread"><h3>התחברות לסנכרון</h3><button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="muted small" style="margin-bottom:12px">התחבר עם חשבון VeriBayit כדי לסנכרן בין מחשב לנייד.</div>
+    <button class="btn" style="width:100%;padding:12px;background:#fff;color:#1f2937" onclick="cloudGoogle()">🔵 התחבר עם Google</button>
+    <div class="muted small" style="text-align:center;margin:12px 0">— או עם מייל וסיסמה —</div>
+    <label class="fl">מייל</label><input id="syncEmail" type="email" autocomplete="username">
+    <label class="fl">סיסמה</label><input id="syncPw" type="password" autocomplete="current-password">
+    <div class="hr"></div>
+    <div class="row spread"><button class="btn ghost" onclick="closeModal()">ביטול</button><button class="btn" onclick="cloudEmailLogin()">התחבר</button></div>`;
+  document.getElementById('ov').classList.add('on');
+}
+function cloudGoogle(){
+  if(!window.__sb){ toast('הסנכרון עוד נטען — נסה שוב בעוד רגע'); return; }
+  const redirectTo=window.location.href.split('#')[0].split('?')[0];
+  window.__sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo } });
+}
+async function cloudEmailLogin(){
+  if(!window.__sb){ toast('הסנכרון עוד נטען — נסה שוב בעוד רגע'); return; }
+  const email=(document.getElementById('syncEmail').value||'').trim().toLowerCase();
+  const pw=document.getElementById('syncPw').value||'';
+  try{
+    const { error }=await window.__sb.auth.signInWithPassword({email,password:pw});
+    if(error){ toast('התחברות נכשלה — בדוק מייל/סיסמה'); return; }
+    closeModal();
+    const { data:{ session } }=await window.__sb.auth.getSession();
+    cloudUser=session?session.user:null;
+    await cloudPullOrSeed(); renderSyncBar(); toast('מחובר ומסונכרן ✓');
+  }catch(e){ toast('שגיאה בהתחברות'); }
 }
 async function cloudLogout(){ try{ await window.__sb.auth.signOut(); }catch(e){} cloudUser=null; renderSyncBar(); toast('התנתקת — הנתונים נשארים מקומית'); }
 function renderSyncBar(){
