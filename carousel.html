@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VeriBayit · קרוסלה לאינסטגרם + סטורי</title>
+<title>VeriBayit · קרוסלה לאינסטגרם + סטורי (עם תמונות)</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0b1220;--accent:#60a5fa;--cyan:#22d3ee;--text:#e6edf7;--muted:#8aa0c2;--success:#34d399}
@@ -11,7 +11,8 @@
   body{margin:0;background:var(--bg);color:var(--text);font-family:Heebo,Arial,sans-serif;padding:24px 14px 60px}
   .wrap{max-width:1000px;margin:0 auto}
   h1{font-size:22px;margin:0 0 4px} .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
-  .help{background:rgba(96,165,250,.08);border:1px solid #22304d;border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+  .help{background:rgba(96,165,250,.08);border:1px solid #22304d;border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+  .warn{background:rgba(245,158,11,.08);border:1px solid #5a4a22;border-radius:12px;padding:10px 14px;font-size:13px;color:#f5c97a;margin-bottom:18px}
   .grid{display:grid;gap:22px;grid-template-columns:1fr}
   @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
   .card{background:#0f1a30;border:1px solid #22304d;border-radius:16px;padding:14px}
@@ -19,156 +20,110 @@
   .frame{background:#000;border-radius:10px;overflow:hidden;display:flex;justify-content:center}
   .frame svg{width:100%;height:auto;display:block}
   .frame.story{max-width:230px;margin:0 auto}
-  .btn{display:block;width:100%;margin-top:12px;background:var(--accent);color:#06122a;border:none;padding:11px;border-radius:9px;
-    font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
+  .btn{display:block;width:100%;margin-top:12px;background:var(--accent);color:#06122a;border:none;padding:11px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
   .btn:hover{filter:brightness(1.08)}
   .allbtn{background:var(--success);max-width:360px;margin:0 auto 22px}
+  #status{text-align:center;color:var(--muted);padding:30px;font-size:15px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>🎨 קרוסלה לאינסטגרם + סטורי — VeriBayit</h1>
-  <div class="sub">5 שקופיות מרובעות (1080×1080) + סטורי אנכי (1080×1920)</div>
+  <div class="sub">5 שקופיות מרובעות (1080×1080) + סטורי אנכי (1080×1920) · עם צילומי מסך אמיתיים</div>
+  <div class="warn">⚠️ <b>חשוב:</b> כדי שהתמונות ייטענו — פתח דף זה דרך <b>הכתובת</b> (GitHub Pages / שרת), לא בלחיצה כפולה על הקובץ.</div>
   <div class="help">
-    📥 <b>איך מורידים:</b> לחץ "הורד PNG" מתחת לכל שקופית — נשמר קובץ מוכן להעלאה.<br>
-    📱 <b>אינסטגרם:</b> פוסט חדש → בחר את 5 השקופיות המרובעות לפי הסדר (1→5).<br>
-    📖 <b>סטורי (פייסבוק/אינסטגרם):</b> השתמש בשקופית הסטורי האנכית.<br>
-    💡 אפשר לפתוח את הדף הזה <b>ישירות מהנייד</b> (GitHub Pages) ולהוריד משם.
+    📥 <b>הורדה:</b> "הורד PNG" מתחת לכל שקופית (או "הורד הכל").<br>
+    📱 <b>אינסטגרם:</b> פוסט חדש → 5 השקופיות המרובעות לפי הסדר (1→5).<br>
+    📖 <b>סטורי (FB/IG):</b> שקופית הסטורי האנכית.
   </div>
   <button class="btn allbtn" onclick="dlAll()">📥 הורד את כל 6 השקופיות</button>
-
+  <div id="status">⏳ טוען תמונות ובונה שקופיות…</div>
   <div class="grid" id="grid"></div>
 </div>
 
 <script>
-// ====== תוכן השקופיות ======
-const C = { bg1:'#0b1220', bg2:'#16233d', accent:'#60a5fa', cyan:'#22d3ee', text:'#e6edf7', muted:'#9fb3d1', success:'#34d399', warn:'#f59e0b' };
+const C={bg1:'#0b1220',bg2:'#16233d',accent:'#60a5fa',cyan:'#22d3ee',text:'#e6edf7',muted:'#9fb3d1',success:'#34d399',warn:'#f59e0b'};
+const IMG={excel:'img/excel.jpg',dash:'img/dashboard.jpg',coll:'img/collection.jpg',bank:'img/bank.jpg',phone:'img/phone.png'};
+let D={};
 
-// wordmark משותף (Veri לבן + Bayit כחול)
-function wordmark(cx,cy,size){
-  return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="800" font-size="${size}" letter-spacing="1">
-    <tspan fill="${C.text}">Veri</tspan><tspan fill="${C.accent}">Bayit</tspan></text>`;
+function toDataURL(url){return fetch(url).then(r=>r.blob()).then(b=>new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b);}));}
+
+// ---- בנייני SVG ----
+function wordmark(cx,cy,size){return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="800" font-size="${size}" letter-spacing="1"><tspan fill="${C.text}">Veri</tspan><tspan fill="${C.accent}">Bayit</tspan></text>`;}
+function dots(cx,cy,active){let s='';for(let i=0;i<5;i++){const x=cx-88+i*44;s+=`<circle cx="${x}" cy="${cy}" r="${i===active?9:6}" fill="${i===active?C.accent:'#33405e'}"/>`;}return s;}
+function lines(cx,y,arr,size,weight,fill,lh){let s=`<text x="${cx}" y="${y}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="${weight}" font-size="${size}" fill="${fill}" style="direction:rtl">`;arr.forEach((t,i)=>{s+=`<tspan x="${cx}" dy="${i===0?0:lh}">${t}</tspan>`;});return s+'</text>';}
+function bg(id,w,h){return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${C.bg2}"/><stop offset="1" stop-color="${C.bg1}"/></linearGradient><radialGradient id="${id}b" cx="0.85" cy="0.12" r="0.9"><stop offset="0" stop-color="rgba(96,165,250,0.18)"/><stop offset="1" stop-color="rgba(96,165,250,0)"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#${id})"/><rect width="${w}" height="${h}" fill="url(#${id}b)"/>`;}
+// פאנל צילום-מסך ממוסגר (slice=cover) / מוקאפ (meet=contain ללא מסגרת)
+function shot(cid,x,y,w,h,data,fit){
+  const fr = fit==='meet' ? '' : `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="none" stroke="#3a4a6b" stroke-width="4"/>`;
+  return `<clipPath id="${cid}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22"/></clipPath>
+    <image href="${data}" xlink:href="${data}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid ${fit||'slice'}" clip-path="url(#${cid})"/>${fr}`;
 }
-// נקודות אינדיקטור לקרוסלה
-function dots(cx,cy,active){
-  let s='';for(let i=0;i<5;i++){const x=cx-88+i*44;s+=`<circle cx="${x}" cy="${cy}" r="${i===active?9:6}" fill="${i===active?C.accent:'#33405e'}"/>`;}
-  return s;
+const SVGH='<svg id="ID" viewBox="0 0 W H" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
+function sq(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H',1080)+inner+'</svg>';}
+function st(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H',1920)+inner+'</svg>';}
+
+// ---- 5 שקופיות מרובעות ----
+function buildSquares(){return [
+  // 1 הוק
+  sq('sq0', bg('g0',1080,1080)+wordmark(540,130,46)+`<rect x="430" y="160" width="220" height="4" rx="2" fill="${C.cyan}"/>`
+    +lines(540,330,['תפסיק לרדוף','אחרי מי ששילם 👇'],86,'900',C.text,100)
+    +lines(540,500,['ועד בית'],86,'900',C.accent,0)
+    +shot('c0',90,560,900,400,D.dash,'slice')
+    +lines(540,1010,['החליקו →'],38,'700',C.cyan,0)+dots(540,1050,0)),
+  // 2 כאב
+  sq('sq1', bg('g1',1080,1080)+lines(540,130,['הדרך הישנה 😮‍💨'],58,'800',C.warn,0)
+    +shot('c1',90,200,900,560,D.excel,'slice')
+    +lines(540,880,['שעות עם אקסל.','מי שילם? מי לא?'],58,'700',C.text,72)+dots(540,1010,1)),
+  // 3 פתרון
+  sq('sq2', bg('g2',1080,1080)+lines(540,130,['הדרך החדשה ✨'],58,'800',C.cyan,0)
+    +shot('c2',90,200,900,520,D.dash,'slice')
+    +lines(540,840,['רואים מי שילם','— בלחיצה.'],62,'800',C.success,76)+dots(540,1020,2)),
+  // 4 איך
+  sq('sq3', bg('g3',1080,1080)+lines(540,130,['איך? 🔌'],58,'800',C.accent,0)
+    +shot('c3',90,200,900,520,D.coll,'slice')
+    +lines(540,840,['מתחברת לדף הבנק','ומזהה לבד מי שילם.'],56,'700',C.text,72)+dots(540,1020,3)),
+  // 5 CTA
+  sq('sq4', bg('g4',1080,1080)+wordmark(540,120,44)
+    +lines(540,250,['עכשיו זה לוקח דקות.'],58,'900',C.text,0)
+    +`<rect x="240" y="310" width="600" height="130" rx="65" fill="${C.accent}"/>`+lines(540,393,['🚀 דמו חינם 3 ימים'],52,'900','#06122a',0)
+    +lines(540,520,['veribayit.com'],54,'800',C.cyan,0)
+    +shot('c4',150,580,780,360,D.coll,'slice')+dots(540,1000,4)),
+];}
+
+// ---- סטורי 1080×1920 ----
+function buildStory(){return st('story', bg('gs',1080,1920)+wordmark(540,220,54)+`<rect x="410" y="255" width="260" height="5" rx="3" fill="${C.cyan}"/>`
+  +lines(540,470,['תפסיק לרדוף','אחרי מי ששילם 👇'],84,'900',C.text,100)
+  +lines(540,650,['ועד בית'],84,'900',C.accent,0)
+  +shot('cs',330,740,420,760,D.phone,'meet')
+  +`<rect x="190" y="1560" width="700" height="140" rx="70" fill="${C.accent}"/>`+lines(540,1648,['🚀 דמו חינם 3 ימים'],54,'900','#06122a',0)
+  +lines(540,1790,['veribayit.com'],58,'800',C.cyan,0));}
+
+// ---- רינדור ----
+async function init(){
+  try{ for(const k in IMG){ D[k]=await toDataURL(IMG[k]); } }
+  catch(e){ document.getElementById('status').innerHTML='❌ טעינת התמונות נכשלה. ודא שפתחת דרך הכתובת (לא קובץ מקומי).'; return; }
+  document.getElementById('status').style.display='none';
+  const grid=document.getElementById('grid');
+  buildSquares().forEach((svg,i)=>{
+    grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>שקופית ${i+1} / 5 · אינסטגרם (1080×1080)</h3><div class="frame">${svg}</div><button class="btn" onclick="dl('sq${i}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
+  });
+  grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>📖 סטורי · פייסבוק/אינסטגרם (1080×1920)</h3><div class="frame story">${buildStory()}</div><button class="btn" onclick="dl('story','veribayit-story.png',1080,1920)">📥 הורד PNG</button></div>`);
 }
-// טקסט רב-שורות ממורכז
-function lines(cx,y,arr,size,weight,fill,lh){
-  let s=`<text x="${cx}" y="${y}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="${weight}" font-size="${size}" fill="${fill}" style="direction:rtl">`;
-  arr.forEach((t,i)=>{ s+=`<tspan x="${cx}" dy="${i===0?0:lh}">${t}</tspan>`; });
-  return s+'</text>';
-}
-function bgRect(id,w,h){
-  return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="${C.bg2}"/><stop offset="1" stop-color="${C.bg1}"/></linearGradient>
-    <radialGradient id="${id}b" cx="0.8" cy="0.15" r="0.9">
-    <stop offset="0" stop-color="rgba(96,165,250,0.18)"/><stop offset="1" stop-color="rgba(96,165,250,0)"/></radialGradient></defs>
-    <rect width="${w}" height="${h}" fill="url(#${id})"/><rect width="${w}" height="${h}" fill="url(#${id}b)"/>`;
-}
 
-// ====== 5 שקופיות מרובעות 1080×1080 ======
-const SQ = [
-  // 1 — HOOK
-  (id)=>`<svg id="${id}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-    ${bgRect(id+'g',1080,1080)}
-    ${wordmark(540,150,48)}
-    <rect x="430" y="185" width="220" height="4" rx="2" fill="${C.cyan}"/>
-    ${lines(540,470,['תפסיק לרדוף','אחרי מי ששילם'],108,'900',C.text,128)}
-    ${lines(540,700,['ועד בית 👇'],108,'900',C.accent,0)}
-    ${lines(540,860,['ככה מנהלים גבייה ב-2026'],46,'600',C.muted,0)}
-    ${lines(540,1000,['החליקו →'],40,'700',C.cyan,0)}
-    ${dots(540,1050,0)}
-  </svg>`,
-  // 2 — PAIN
-  (id)=>`<svg id="${id}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-    ${bgRect(id+'g',1080,1080)}
-    ${wordmark(540,140,40)}
-    ${lines(540,300,['סוף החודש המוכר 😮‍💨'],58,'800',C.warn,0)}
-    ${lines(540,470,['דף בנק פתוח.','אקסל ענק.','ואתה מנסה להבין','מי מ-70 הדירות שילם.'],70,'700',C.text,96)}
-    ${lines(540,880,['שעות. כל חודש מחדש.'],56,'800',C.muted,0)}
-    ${dots(540,1010,1)}
-  </svg>`,
-  // 3 — SOLUTION
-  (id)=>`<svg id="${id}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-    ${bgRect(id+'g',1080,1080)}
-    ${wordmark(540,140,40)}
-    ${lines(540,300,['יש דרך אחרת.'],62,'800',C.cyan,0)}
-    ${lines(540,470,['VeriBayit מתחברת','לדף הבנק','ומזהה לבד','מי שילם, כמה,','ועל איזה חודש.'],66,'700',C.text,92)}
-    ${lines(540,930,['בלי אקסל. בלי לרדוף.'],52,'800',C.success,0)}
-    ${dots(540,1020,2)}
-  </svg>`,
-  // 4 — DIFFERENTIATOR
-  (id)=>`<svg id="${id}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-    ${bgRect(id+'g',1080,1080)}
-    ${wordmark(540,140,40)}
-    ${lines(540,300,['והכי חשוב 👇'],58,'800',C.accent,0)}
-    ${lines(540,470,['הכסף לא עובר','דרך אף אחד —','נשאר בחשבון הוועד.'],72,'800',C.text,98)}
-    ${lines(540,810,['בלי עמלות סליקה'],50,'700',C.muted,0)}
-    ${lines(540,900,['פי 7 זול מהמתחרים 💰'],56,'800',C.success,0)}
-    ${dots(540,1020,3)}
-  </svg>`,
-  // 5 — CTA
-  (id)=>`<svg id="${id}" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-    ${bgRect(id+'g',1080,1080)}
-    ${wordmark(540,150,48)}
-    ${lines(540,400,['סוף החודש לקח שעות.'],58,'700',C.muted,0)}
-    ${lines(540,500,['עכשיו זה לוקח דקות.'],64,'900',C.text,0)}
-    <rect x="190" y="600" width="700" height="150" rx="75" fill="${C.accent}"/>
-    ${lines(540,695,['🚀 דמו חינם 3 ימים'],56,'900','#06122a',0)}
-    ${lines(540,840,['בלי כרטיס אשראי'],42,'600',C.muted,0)}
-    ${lines(540,960,['veribayit.com'],60,'800',C.cyan,0)}
-    ${dots(540,1040,4)}
-  </svg>`
-];
-
-// ====== סטורי 1080×1920 ======
-const STORY = (id)=>`<svg id="${id}" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
-  ${bgRect(id+'g',1080,1920)}
-  ${wordmark(540,280,56)}
-  <rect x="410" y="320" width="260" height="5" rx="3" fill="${C.cyan}"/>
-  ${lines(540,640,['תפסיק לרדוף','אחרי מי ששילם','ועד בית 👇'],100,'900',C.text,120)}
-  ${lines(540,1050,['VeriBayit מתחברת','לדף הבנק ומזהה','לבד מי שילם.'],62,'700',C.muted,86)}
-  <rect x="190" y="1320" width="700" height="150" rx="75" fill="${C.accent}"/>
-  ${lines(540,1415,['🚀 דמו חינם 3 ימים'],56,'900','#06122a',0)}
-  ${lines(540,1560,['veribayit.com'],62,'800',C.cyan,0)}
-  ${lines(540,1700,['הכסף נשאר בחשבון הוועד · פי 7 זול'],38,'600',C.muted,0)}
-</svg>`;
-
-// ====== רינדור ======
-const grid=document.getElementById('grid');
-SQ.forEach((fn,i)=>{
-  const id='sq'+i;
-  grid.insertAdjacentHTML('beforeend',
-    `<div class="card"><h3>שקופית ${i+1} / 5 · אינסטגרם (1080×1080)</h3>
-     <div class="frame">${fn(id)}</div>
-     <button class="btn" onclick="dl('${id}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
-});
-grid.insertAdjacentHTML('beforeend',
-  `<div class="card"><h3>📖 סטורי · פייסבוק/אינסטגרם (1080×1920)</h3>
-   <div class="frame story">${STORY('story')}</div>
-   <button class="btn" onclick="dl('story','veribayit-story.png',1080,1920)">📥 הורד PNG</button></div>`);
-
-// ====== הורדת PNG (SVG→canvas, ללא ספריות) ======
+// ---- הורדת PNG (SVG→canvas, תמונות מוטמעות כ-dataURL) ----
 function dl(svgId,name,w,h){
   const svg=document.getElementById(svgId);
   const xml=new XMLSerializer().serializeToString(svg);
   const src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(xml)));
   const img=new Image();
-  img.onload=function(){
-    const c=document.createElement('canvas');c.width=w;c.height=h;
-    const ctx=c.getContext('2d');ctx.fillStyle='#0b1220';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
-    const a=document.createElement('a');a.download=name;a.href=c.toDataURL('image/png');
-    document.body.appendChild(a);a.click();a.remove();
-  };
+  img.onload=function(){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.fillStyle='#0b1220';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);const a=document.createElement('a');a.download=name;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();};
   img.onerror=function(){alert('הורדה נכשלה — נסה צילום מסך של השקופית.');};
   img.src=src;
 }
-async function dlAll(){
-  for(let i=0;i<SQ.length;i++){ dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080); await new Promise(r=>setTimeout(r,500)); }
-  await new Promise(r=>setTimeout(r,500)); dl('story','veribayit-story.png',1080,1920);
-}
+async function dlAll(){for(let i=0;i<5;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}await new Promise(r=>setTimeout(r,600));dl('story','veribayit-story.png',1080,1920);}
+
+init();
 </script>
 </body>
 </html>
