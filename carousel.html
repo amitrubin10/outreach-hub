@@ -97,9 +97,12 @@ function st(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H'
 // ---- 5 שקופיות מרובעות ----
 // full-bleed — כל גרפיקה ממלאת את כל השקופית (cover). הגרפיקות ממותגות עם טקסט משלהן.
 function buildSquares(){return [
-  // 1 הוק — DESH מלא (תמונה שלמה + מילוי מטושטש)
+  // 1 הוק — DESH מלא + כותרת-על (סלוגן) למעלה, בלי להקטין את התמונה
   sq('sq0', shotFit('s0',1080,1080,D.dash)
-    +scrim('s0',1080,940,140,0.7)+lines(540,1035,['👇 החליקו'],38,'800',C.cyan,0)+dots(540,1075,0)),
+    +`<defs><linearGradient id="ts0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070c18" stop-opacity="0.92"/><stop offset="0.65" stop-color="#070c18" stop-opacity="0.55"/><stop offset="1" stop-color="#070c18" stop-opacity="0"/></linearGradient></defs><rect x="0" y="0" width="1080" height="400" fill="url(#ts0)"/>`
+    +lines(540,115,['התוכנה היחידה שמתחברת','לדף הבנק ומזהה כל תנועה'],50,'900',C.text,66)
+    +lines(540,258,['— אוטומטית 🤖'],54,'900',C.cyan,0)
+    +scrim('s0',1080,960,120,0.7)+lines(540,1035,['👇 החליקו'],36,'800',C.cyan,0)+dots(540,1072,0)),
   // 2 כאב — אקסל
   sq('sq1', shotFit('s1',1080,1080,D.excel)
     +scrim('s1',1080,920,160,0.78)+lines(540,1010,['הדרך הישנה — שעות עם אקסל 😮‍💨'],38,'800',C.text,0)+dots(540,1055,1)),
