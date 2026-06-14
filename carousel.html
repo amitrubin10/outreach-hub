@@ -29,13 +29,14 @@
 <body>
 <div class="wrap">
   <h1>🎨 קרוסלה לאינסטגרם + סטורי — VeriBayit</h1>
-  <div class="sub">5 שקופיות מרובעות (1080×1080) + סטורי אנכי (1080×1920) · עם צילומי מסך אמיתיים</div>
+  <div class="sub">7 שקופיות קרוסלה (1080×1080) + 7 גרסאות סטורי (1080×1920) · עם צילומי מסך אמיתיים</div>
   <div class="warn">⚠️ <b>חשוב:</b> כדי שהתמונות ייטענו — פתח דף זה דרך <b>הכתובת</b> (GitHub Pages / שרת), לא בלחיצה כפולה על הקובץ.</div>
   <div class="help">
     📥 <b>הורדה:</b> "הורד PNG" מתחת לכל שקופית (או "הורד הכל").<br>
-    📱 <b>אינסטגרם:</b> פוסט חדש → 7 השקופיות לפי הסדר (1→7).
+    📱 <b>אינסטגרם (קרוסלה):</b> פוסט חדש → 7 השקופיות המרובעות לפי הסדר (1→7).<br>
+    📖 <b>סטורי (פייסבוק/אינסטגרם):</b> כל גרסת סטורי בנפרד — מלא-מסך אנכי.
   </div>
-  <button class="btn allbtn" onclick="dlAll()">📥 הורד את כל 8 השקופיות</button>
+  <button class="btn allbtn" onclick="dlAll()">📥 הורד הכל (7 קרוסלה + 7 סטורי)</button>
   <div id="status">⏳ טוען תמונות ובונה שקופיות…</div>
   <div class="grid" id="grid"></div>
 </div>
@@ -122,11 +123,28 @@ function buildSquares(){return [
     +lines(540,1025,['veribayit.com'],52,'800',C.cyan,0)+dots(540,1062,6)),
 ];}
 
-// ---- סטורי 1080×1920 — מוקאפ נייד (תמונה שלמה + מילוי) ----
-function buildStory(){return st('story', shotFit('ss',1080,1920,D.mobile)
-  +scrim('ss',1080,1480,440,0.9)
-  +`<rect x="190" y="1560" width="700" height="140" rx="70" fill="${C.accent}"/>`+lines(540,1648,['🚀 דמו חינם 3 ימים'],54,'900','#06122a',0)
-  +lines(540,1790,['veribayit.com'],58,'800',C.cyan,0));}
+// ---- גרסאות סטורי 1080×1920 (אנכי, מלא-מסך) — אותן תמונות, מילוי מטושטש ----
+function buildStories(){return [
+  // 1 אקסל + כיתוב (למעלה)
+  st('st0', shotFit('st0',1080,1920,D.excel)
+    +`<defs><linearGradient id="tst0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070c18" stop-opacity="0.92"/><stop offset="0.7" stop-color="#070c18" stop-opacity="0.4"/><stop offset="1" stop-color="#070c18" stop-opacity="0"/></linearGradient></defs><rect x="0" y="0" width="1080" height="560" fill="url(#tst0)"/>`
+    +`<text x="540" y="220" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="900" font-size="52" fill="${C.text}" style="direction:rtl"><tspan x="540" dy="0">כל החודש רודף אחרי תשלומים</tspan><tspan x="540" dy="80">מי שילם, מי לא? <tspan fill="${C.accent}">יש דרך אחרת.</tspan></tspan></text>`),
+  // 2 דשבורד
+  st('st1', shotFit('st1',1080,1920,D.dash)),
+  // 3 בנק
+  st('st2', shotFit('st2',1080,1920,D.bank)),
+  // 4 וואטסאפ
+  st('st3', shotFit('st3',1080,1920,D.what)),
+  // 5 ספקים
+  st('st4', shotFit('st4',1080,1920,D.sapakim)),
+  // 6 מובייל
+  st('st5', shotFit('st5',1080,1920,D.mobile)),
+  // 7 CTA — pay
+  st('st6', shotFit('st6',1080,1920,D.pay)
+    +scrim('st6',1080,1440,480,0.92)
+    +`<rect x="190" y="1540" width="700" height="140" rx="70" fill="${C.accent}"/>`+lines(540,1628,['🚀 דמו חינם 3 ימים'],54,'900','#06122a',0)
+    +lines(540,1770,['veribayit.com'],58,'800',C.cyan,0)),
+];}
 
 // ---- רינדור ----
 async function init(){
@@ -135,8 +153,14 @@ async function init(){
   document.getElementById('status').style.display='none';
   const grid=document.getElementById('grid');
   const sqs=buildSquares();
+  grid.insertAdjacentHTML('beforeend',`<div style="grid-column:1/-1;font-weight:800;font-size:18px;color:var(--accent,#60a5fa);margin:4px 0">📱 קרוסלה לאינסטגרם (1080×1080) — ${sqs.length} שקופיות</div>`);
   sqs.forEach((svg,i)=>{
     grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>שקופית ${i+1} / ${sqs.length} · אינסטגרם (1080×1080)</h3><div class="frame">${svg}</div><button class="btn" onclick="dl('sq${i}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
+  });
+  const sts=buildStories();
+  grid.insertAdjacentHTML('beforeend',`<div style="grid-column:1/-1;font-weight:800;font-size:18px;color:#22d3ee;margin:24px 0 4px;border-top:1px solid #233;padding-top:20px">📖 גרסאות סטורי (1080×1920) — פייסבוק/אינסטגרם</div>`);
+  sts.forEach((svg,i)=>{
+    grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>סטורי ${i+1} / ${sts.length} · אנכי (1080×1920)</h3><div class="frame story">${svg}</div><button class="btn" onclick="dl('st${i}','veribayit-story-${i+1}.png',1080,1920)">📥 הורד PNG</button></div>`);
   });
 }
 
@@ -150,7 +174,10 @@ function dl(svgId,name,w,h){
   img.onerror=function(){alert('הורדה נכשלה — נסה צילום מסך של השקופית.');};
   img.src=src;
 }
-async function dlAll(){for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}}
+async function dlAll(){
+  for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}
+  for(let i=0;i<NSQ;i++){dl('st'+i,'veribayit-story-'+(i+1)+'.png',1080,1920);await new Promise(r=>setTimeout(r,600));}
+}
 
 init();
 </script>

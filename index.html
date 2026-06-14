@@ -125,6 +125,7 @@
     <button class="tab" data-t="leads">👤 לידים</button>
     <button class="tab" data-t="templates">💬 תגובות</button>
     <button class="tab" data-t="studio">✍️ סטודיו פוסטים</button>
+    <button class="tab" data-t="media">📣 מדיה</button>
     <button class="tab" data-t="backup">⚙️ הגדרות</button>
   </div>
 
@@ -356,7 +357,7 @@ function render(){
     +`<button class="pjt add" onclick="addProject()">➕ פרויקט</button>`;
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.t===state.meta.activeTab));
   document.getElementById('content').innerHTML=
-    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,studio:vStudio,backup:vBackup}[state.meta.activeTab]||vDash)();
+    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,studio:vStudio,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
 }
 
 // ---- פרויקטים ----
@@ -624,6 +625,21 @@ function editDraft(id){
   ],d,o=>{if(id)Object.assign(d,o);else p.drafts.push({id:uid(),...o});save();render();});
 }
 function copyDraft(id){const d=P().drafts.find(x=>x.id===id);if(d)copyText(d.body);}
+
+// ---- מדיה (קרוסלה + סטורי לפרסום) ----
+function vMedia(){
+  return `<div class="row spread"><b>📣 חומרי פרסום מוכנים</b></div>
+    <div class="card">
+      <b>🎨 אולפן המדיה — VeriBayit</b>
+      <p class="muted small" style="margin:8px 0 14px;line-height:1.7">
+        כל השקופיות מוכנות להורדה בכל רגע — להעלות לפייסבוק/אינסטגרם מתי שתרצה.<br>
+        📱 <b>קרוסלה לאינסטגרם</b> — 7 שקופיות מרובעות (1080×1080), לפוסט בסדר 1→7.<br>
+        📖 <b>גרסאות סטורי</b> — 7 שקופיות אנכיות מלא-מסך (1080×1920), כל אחת בנפרד.
+      </p>
+      <a class="btn" href="carousel.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🚀 פתח את אולפן המדיה (קרוסלה + סטורי) ←</a>
+    </div>
+    <div class="card empty small">💡 טיפ: בקרוסלה יש כפתור "📥 הורד הכל" שמוריד את כל 14 השקופיות בבת אחת.</div>`;
+}
 
 // ---- הגדרות וגיבוי ----
 function vBackup(){
