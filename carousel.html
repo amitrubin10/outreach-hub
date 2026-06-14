@@ -77,12 +77,14 @@ function shot(cid,x,y,w,h,data,fit){
 function shotFull(idp,w,h,data){
   return `<image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>`;
 }
-// תמונה מלאה (meet) במרכז + רקע מטושטש של אותה תמונה ממלא את השוליים — רואים הכל, ממלא את השקופית
-function shotFit(idp,w,h,data){
+// תמונה מלאה (meet) + רקע מטושטש של אותה תמונה ממלא את השוליים — רואים הכל, ממלא את השקופית.
+// va: יישור אנכי של התמונה הקדמית ('YMid' מרכז ברירת מחדל · 'YMin' למעלה · 'YMax' למטה)
+function shotFit(idp,w,h,data,va){
+  const par='xMid'+(va||'YMid')+' meet';
   return `<defs><filter id="${idp}bl" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="26"/></filter></defs>
     <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" filter="url(#${idp}bl)"/>
     <rect x="0" y="0" width="${w}" height="${h}" fill="#070c18" opacity="0.45"/>
-    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`;
+    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="${par}"/>`;
 }
 // הצללה (scrim) בתחתית — לקריאוּת טקסט/נקודות מעל התמונה
 function scrim(idp,w,y,hh,op){
@@ -111,11 +113,11 @@ function buildSquares(){return [
     +scrim('s2',1080,990,90,0.6)+dots(540,1050,2)),
   // 4 ספקים — SAPAK
   sq('sq3', shotFit('s3',1080,1080,D.sapakim)+scrim('s3',1080,990,90,0.6)+dots(540,1050,3)),
-  // 5 וואטסאפ + CTA — what
-  sq('sq4', shotFit('s4',1080,1080,D.what)
-    +scrim('s4',1080,760,320,0.9)
-    +`<rect x="250" y="820" width="580" height="115" rx="58" fill="${C.accent}"/>`+lines(540,894,['🚀 דמו חינם 3 ימים'],45,'900','#06122a',0)
-    +lines(540,1000,['veribayit.com'],48,'800',C.cyan,0)+dots(540,1052,4)),
+  // 5 וואטסאפ + CTA — what (תמונה צמודה למעלה, CTA למטה מתחתיה)
+  sq('sq4', shotFit('s4',1080,1080,D.what,'YMin')
+    +scrim('s4',1080,720,360,0.95)
+    +`<rect x="250" y="800" width="580" height="118" rx="59" fill="${C.accent}"/>`+lines(540,876,['🚀 דמו חינם 3 ימים'],46,'900','#06122a',0)
+    +lines(540,985,['veribayit.com'],50,'800',C.cyan,0)+dots(540,1045,4)),
 ];}
 
 // ---- סטורי 1080×1920 — מוקאפ נייד (תמונה שלמה + מילוי) ----
