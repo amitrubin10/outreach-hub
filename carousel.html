@@ -36,7 +36,10 @@
     📱 <b>אינסטגרם (קרוסלה):</b> פוסט חדש → 7 השקופיות המרובעות לפי הסדר (1→7).<br>
     📖 <b>סטורי (פייסבוק/אינסטגרם):</b> כל גרסת סטורי בנפרד — מלא-מסך אנכי.
   </div>
-  <button class="btn allbtn" onclick="dlAll()">📥 הורד הכל (7 קרוסלה + 7 סטורי)</button>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px">
+    <button class="btn allbtn" onclick="dlAllSquares()">📱 הורד את כל הקרוסלה (7 לאינסטגרם)</button>
+    <button class="btn allbtn" onclick="dlAllStories()">📖 הורד את כל הסטורי (7 אנכי)</button>
+  </div>
   <div id="status">⏳ טוען תמונות ובונה שקופיות…</div>
   <div class="grid" id="grid"></div>
 </div>
@@ -174,10 +177,8 @@ function dl(svgId,name,w,h){
   img.onerror=function(){alert('הורדה נכשלה — נסה צילום מסך של השקופית.');};
   img.src=src;
 }
-async function dlAll(){
-  for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}
-  for(let i=0;i<NSQ;i++){dl('st'+i,'veribayit-story-'+(i+1)+'.png',1080,1920);await new Promise(r=>setTimeout(r,600));}
-}
+async function dlAllSquares(){for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}}
+async function dlAllStories(){for(let i=0;i<NSQ;i++){dl('st'+i,'veribayit-story-'+(i+1)+'.png',1080,1920);await new Promise(r=>setTimeout(r,600));}}
 
 init();
 </script>
