@@ -77,6 +77,13 @@ function shot(cid,x,y,w,h,data,fit){
 function shotFull(idp,w,h,data){
   return `<image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>`;
 }
+// תמונה מלאה (meet) במרכז + רקע מטושטש של אותה תמונה ממלא את השוליים — רואים הכל, ממלא את השקופית
+function shotFit(idp,w,h,data){
+  return `<defs><filter id="${idp}bl" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="26"/></filter></defs>
+    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" filter="url(#${idp}bl)"/>
+    <rect x="0" y="0" width="${w}" height="${h}" fill="#070c18" opacity="0.45"/>
+    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`;
+}
 // הצללה (scrim) בתחתית — לקריאוּת טקסט/נקודות מעל התמונה
 function scrim(idp,w,y,hh,op){
   return `<defs><linearGradient id="${idp}scr" x1="0" y1="0" x2="0" y2="1">
@@ -90,30 +97,26 @@ function st(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H'
 // ---- 5 שקופיות מרובעות ----
 // full-bleed — כל גרפיקה ממלאת את כל השקופית (cover). הגרפיקות ממותגות עם טקסט משלהן.
 function buildSquares(){return [
-  // 1 הוק — DESH מלא
-  sq('sq0', shotFull('s0',1080,1080,D.dash)
-    +scrim('s0',1080,900,180,0.82)
-    +lines(540,1015,['👇 החליקו'],40,'800',C.cyan,0)+dots(540,1055,0)),
-  // 2 כאב — אקסל מלא
-  sq('sq1', shotFull('s1',1080,1080,D.excel)
-    +scrim('s1',1080,860,220,0.86)
-    +lines(540,975,['הדרך הישנה — שעות עם אקסל 😮‍💨'],40,'800',C.text,0)+dots(540,1040,1)),
-  // 3 בנק מלא
-  sq('sq2', shotFull('s2',1080,1080,D.bank)
-    +scrim('s2',1080,930,150,0.8)+dots(540,1035,2)),
-  // 4 ספקים מלא
-  sq('sq3', shotFull('s3',1080,1080,D.sapakim)
-    +scrim('s3',1080,930,150,0.8)+dots(540,1035,3)),
-  // 5 וואטסאפ + CTA — what מלא
-  sq('sq4', shotFull('s4',1080,1080,D.what)
-    +scrim('s4',1080,720,360,0.92)
-    +`<rect x="250" y="800" width="580" height="118" rx="59" fill="${C.accent}"/>`+lines(540,876,['🚀 דמו חינם 3 ימים'],46,'900','#06122a',0)
-    +lines(540,985,['veribayit.com'],50,'800',C.cyan,0)+dots(540,1045,4)),
+  // 1 הוק — DESH מלא (תמונה שלמה + מילוי מטושטש)
+  sq('sq0', shotFit('s0',1080,1080,D.dash)
+    +scrim('s0',1080,940,140,0.7)+lines(540,1035,['👇 החליקו'],38,'800',C.cyan,0)+dots(540,1075,0)),
+  // 2 כאב — אקסל
+  sq('sq1', shotFit('s1',1080,1080,D.excel)
+    +scrim('s1',1080,920,160,0.78)+lines(540,1010,['הדרך הישנה — שעות עם אקסל 😮‍💨'],38,'800',C.text,0)+dots(540,1055,1)),
+  // 3 בנק
+  sq('sq2', shotFit('s2',1080,1080,D.bank)+scrim('s2',1080,990,90,0.6)+dots(540,1050,2)),
+  // 4 ספקים — SAPAK
+  sq('sq3', shotFit('s3',1080,1080,D.sapakim)+scrim('s3',1080,990,90,0.6)+dots(540,1050,3)),
+  // 5 וואטסאפ + CTA — what
+  sq('sq4', shotFit('s4',1080,1080,D.what)
+    +scrim('s4',1080,760,320,0.9)
+    +`<rect x="250" y="820" width="580" height="115" rx="58" fill="${C.accent}"/>`+lines(540,894,['🚀 דמו חינם 3 ימים'],45,'900','#06122a',0)
+    +lines(540,1000,['veribayit.com'],48,'800',C.cyan,0)+dots(540,1052,4)),
 ];}
 
-// ---- סטורי 1080×1920 — מוקאפ נייד (מלא) ----
-function buildStory(){return st('story', shotFull('ss',1080,1920,D.mobile)
-  +scrim('ss',1080,1420,500,0.93)
+// ---- סטורי 1080×1920 — מוקאפ נייד (תמונה שלמה + מילוי) ----
+function buildStory(){return st('story', shotFit('ss',1080,1920,D.mobile)
+  +scrim('ss',1080,1480,440,0.9)
   +`<rect x="190" y="1560" width="700" height="140" rx="70" fill="${C.accent}"/>`+lines(540,1648,['🚀 דמו חינם 3 ימים'],54,'900','#06122a',0)
   +lines(540,1790,['veribayit.com'],58,'800',C.cyan,0));}
 
