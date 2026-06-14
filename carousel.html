@@ -33,17 +33,18 @@
   <div class="warn">⚠️ <b>חשוב:</b> כדי שהתמונות ייטענו — פתח דף זה דרך <b>הכתובת</b> (GitHub Pages / שרת), לא בלחיצה כפולה על הקובץ.</div>
   <div class="help">
     📥 <b>הורדה:</b> "הורד PNG" מתחת לכל שקופית (או "הורד הכל").<br>
-    📱 <b>אינסטגרם:</b> פוסט חדש → 5 השקופיות המרובעות לפי הסדר (1→5).<br>
+    📱 <b>אינסטגרם:</b> פוסט חדש → 7 השקופיות המרובעות לפי הסדר (1→7).<br>
     📖 <b>סטורי (FB/IG):</b> שקופית הסטורי האנכית.
   </div>
-  <button class="btn allbtn" onclick="dlAll()">📥 הורד את כל 6 השקופיות</button>
+  <button class="btn allbtn" onclick="dlAll()">📥 הורד את כל 8 השקופיות</button>
   <div id="status">⏳ טוען תמונות ובונה שקופיות…</div>
   <div class="grid" id="grid"></div>
 </div>
 
 <script>
 const C={bg1:'#0b1220',bg2:'#16233d',accent:'#60a5fa',cyan:'#22d3ee',text:'#e6edf7',muted:'#9fb3d1',success:'#34d399',warn:'#f59e0b'};
-const IMG={excel:'img/excel.png',bank:'img/bank.png',dash:'img/desh.png',sapakim:'img/sapak.png',what:'img/what.png',mobile:'img/mobile.png'};
+const IMG={excel:'img/excel.png',bank:'img/bank_new.png',dash:'img/desh.png',sapakim:'img/sapak.png',what:'img/what.png',mobile:'img/mobil_new.png',pay:'img/pay.png'};
+const NSQ=7; // מספר השקופיות המרובעות (לאינדיקטור הנקודות)
 let D={};
 
 // טוען תמונה (same-origin), מקטין ל-≤1200px ומחזיר JPEG dataURL — דף קליל + הטמעה ב-SVG
@@ -64,7 +65,7 @@ function toDataURL(url){
 
 // ---- בנייני SVG ----
 function wordmark(cx,cy,size){return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="800" font-size="${size}" letter-spacing="1"><tspan fill="${C.text}">Veri</tspan><tspan fill="${C.accent}">Bayit</tspan></text>`;}
-function dots(cx,cy,active){let s='';for(let i=0;i<5;i++){const x=cx-88+i*44;s+=`<circle cx="${x}" cy="${cy}" r="${i===active?9:6}" fill="${i===active?C.accent:'#33405e'}"/>`;}return s;}
+function dots(cx,cy,active){const n=NSQ;let s='';for(let i=0;i<n;i++){const x=cx-(n-1)*22+i*44;s+=`<circle cx="${x}" cy="${cy}" r="${i===active?9:6}" fill="${i===active?C.accent:'#33405e'}"/>`;}return s;}
 function lines(cx,y,arr,size,weight,fill,lh){let s=`<text x="${cx}" y="${y}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="${weight}" font-size="${size}" fill="${fill}" style="direction:rtl">`;arr.forEach((t,i)=>{s+=`<tspan x="${cx}" dy="${i===0?0:lh}">${t}</tspan>`;});return s+'</text>';}
 function bg(id,w,h){return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${C.bg2}"/><stop offset="1" stop-color="${C.bg1}"/></linearGradient><radialGradient id="${id}b" cx="0.85" cy="0.12" r="0.9"><stop offset="0" stop-color="rgba(96,165,250,0.18)"/><stop offset="1" stop-color="rgba(96,165,250,0)"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#${id})"/><rect width="${w}" height="${h}" fill="url(#${id}b)"/>`;}
 // פאנל צילום-מסך ממוסגר (slice=cover) / מוקאפ (meet=contain ללא מסגרת)
@@ -116,6 +117,14 @@ function buildSquares(){return [
   sq('sq3', shotFit('s3',1080,1080,D.sapakim)+scrim('s3',1080,990,90,0.6)+dots(540,1050,3)),
   // 5 וואטסאפ — what (תמונה מלאה, בלי כיתוב)
   sq('sq4', shotFit('s4',1080,1080,D.what)+scrim('s4',1080,990,90,0.6)+dots(540,1050,4)),
+  // 6 — מובייל חדש (תמונה מלאה)
+  sq('sq5', shotFit('s5',1080,1080,D.mobile)+scrim('s5',1080,990,90,0.6)+dots(540,1050,5)),
+  // 7 — CTA סיום: pay (לקוח מרוצה) + דמו חינם
+  sq('sq6', shotFit('s6',1080,1080,D.pay)
+    +scrim('s6',1080,690,390,0.92)
+    +`<rect x="240" y="770" width="600" height="120" rx="60" fill="${C.accent}"/>`+lines(540,848,['🚀 דמו חינם 3 ימים'],50,'900','#06122a',0)
+    +lines(540,945,['בלי כרטיס אשראי'],38,'600',C.muted,0)
+    +lines(540,1025,['veribayit.com'],52,'800',C.cyan,0)+dots(540,1062,6)),
 ];}
 
 // ---- סטורי 1080×1920 — מוקאפ נייד (תמונה שלמה + מילוי) ----
@@ -130,8 +139,9 @@ async function init(){
   catch(e){ document.getElementById('status').innerHTML='❌ טעינת התמונות נכשלה. ודא שפתחת דרך הכתובת (לא קובץ מקומי).'; return; }
   document.getElementById('status').style.display='none';
   const grid=document.getElementById('grid');
-  buildSquares().forEach((svg,i)=>{
-    grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>שקופית ${i+1} / 5 · אינסטגרם (1080×1080)</h3><div class="frame">${svg}</div><button class="btn" onclick="dl('sq${i}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
+  const sqs=buildSquares();
+  sqs.forEach((svg,i)=>{
+    grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>שקופית ${i+1} / ${sqs.length} · אינסטגרם (1080×1080)</h3><div class="frame">${svg}</div><button class="btn" onclick="dl('sq${i}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
   });
   grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>📖 סטורי · פייסבוק/אינסטגרם (1080×1920)</h3><div class="frame story">${buildStory()}</div><button class="btn" onclick="dl('story','veribayit-story.png',1080,1920)">📥 הורד PNG</button></div>`);
 }
@@ -146,7 +156,7 @@ function dl(svgId,name,w,h){
   img.onerror=function(){alert('הורדה נכשלה — נסה צילום מסך של השקופית.');};
   img.src=src;
 }
-async function dlAll(){for(let i=0;i<5;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}await new Promise(r=>setTimeout(r,600));dl('story','veribayit-story.png',1080,1920);}
+async function dlAll(){for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}await new Promise(r=>setTimeout(r,600));dl('story','veribayit-story.png',1080,1920);}
 
 init();
 </script>
