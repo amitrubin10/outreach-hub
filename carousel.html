@@ -33,8 +33,7 @@
   <div class="warn">⚠️ <b>חשוב:</b> כדי שהתמונות ייטענו — פתח דף זה דרך <b>הכתובת</b> (GitHub Pages / שרת), לא בלחיצה כפולה על הקובץ.</div>
   <div class="help">
     📥 <b>הורדה:</b> "הורד PNG" מתחת לכל שקופית (או "הורד הכל").<br>
-    📱 <b>אינסטגרם:</b> פוסט חדש → 7 השקופיות המרובעות לפי הסדר (1→7).<br>
-    📖 <b>סטורי (FB/IG):</b> שקופית הסטורי האנכית.
+    📱 <b>אינסטגרם:</b> פוסט חדש → 7 השקופיות לפי הסדר (1→7).
   </div>
   <button class="btn allbtn" onclick="dlAll()">📥 הורד את כל 8 השקופיות</button>
   <div id="status">⏳ טוען תמונות ובונה שקופיות…</div>
@@ -107,12 +106,8 @@ function buildSquares(){return [
     +scrim('s0',1080,960,120,0.7)+lines(540,1035,['👇 החליקו'],38,'800',C.cyan,0)+dots(540,1072,0)),
   // 2 — DESH (דשבורד) מלא
   sq('sq1', shotFit('s1',1080,1080,D.dash)+scrim('s1',1080,990,90,0.6)+dots(540,1050,1)),
-  // 3 בנק — סלוגן מעל התמונה (בלי להקטין)
-  sq('sq2', shotFit('s2',1080,1080,D.bank)
-    +`<defs><linearGradient id="ts2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070c18" stop-opacity="0.92"/><stop offset="0.65" stop-color="#070c18" stop-opacity="0.55"/><stop offset="1" stop-color="#070c18" stop-opacity="0"/></linearGradient></defs><rect x="0" y="0" width="1080" height="400" fill="url(#ts2)"/>`
-    +lines(540,115,['התוכנה היחידה שמתחברת','לדף הבנק ומזהה כל תנועה'],50,'900',C.text,66)
-    +lines(540,258,['— אוטומטית 🤖'],54,'900',C.cyan,0)
-    +scrim('s2',1080,990,90,0.6)+dots(540,1050,2)),
+  // 3 בנק (bank_new — הטקסט כבר על התמונה)
+  sq('sq2', shotFit('s2',1080,1080,D.bank)+scrim('s2',1080,990,90,0.6)+dots(540,1050,2)),
   // 4 ספקים — SAPAK
   sq('sq3', shotFit('s3',1080,1080,D.sapakim)+scrim('s3',1080,990,90,0.6)+dots(540,1050,3)),
   // 5 וואטסאפ — what (תמונה מלאה, בלי כיתוב)
@@ -143,7 +138,6 @@ async function init(){
   sqs.forEach((svg,i)=>{
     grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>שקופית ${i+1} / ${sqs.length} · אינסטגרם (1080×1080)</h3><div class="frame">${svg}</div><button class="btn" onclick="dl('sq${i}','veribayit-carousel-${i+1}.png',1080,1080)">📥 הורד PNG</button></div>`);
   });
-  grid.insertAdjacentHTML('beforeend',`<div class="card"><h3>📖 סטורי · פייסבוק/אינסטגרם (1080×1920)</h3><div class="frame story">${buildStory()}</div><button class="btn" onclick="dl('story','veribayit-story.png',1080,1920)">📥 הורד PNG</button></div>`);
 }
 
 // ---- הורדת PNG (SVG→canvas, תמונות מוטמעות כ-dataURL) ----
@@ -156,7 +150,7 @@ function dl(svgId,name,w,h){
   img.onerror=function(){alert('הורדה נכשלה — נסה צילום מסך של השקופית.');};
   img.src=src;
 }
-async function dlAll(){for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}await new Promise(r=>setTimeout(r,600));dl('story','veribayit-story.png',1080,1920);}
+async function dlAll(){for(let i=0;i<NSQ;i++){dl('sq'+i,'veribayit-carousel-'+(i+1)+'.png',1080,1080);await new Promise(r=>setTimeout(r,600));}}
 
 init();
 </script>
