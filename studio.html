@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎨 אולפן יצירה — VeriBayit</title>
+<style>
+  :root{--bg:#0b1220;--card:#111a2e;--border:#22304d;--text:#e6edf7;--muted:#9fb3d1;--accent:#60a5fa;--cyan:#22d3ee;--danger:#ef4444}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Heebo,Arial,sans-serif;padding:18px}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{margin:0 0 4px;font-size:24px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .spread{justify-content:space-between}
+  .btn{background:var(--accent);color:#04122b;border:0;border-radius:9px;padding:10px 16px;font-weight:800;cursor:pointer;font-size:14px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:#1b2742;color:var(--text);border:1px solid var(--border)}
+  .btn.cyan{background:var(--cyan)}
+  .btn.sm{padding:5px 10px;font-size:13px;border-radius:7px}
+  .btn.danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+  label{font-size:13px;color:var(--muted)}
+  textarea,select,input[type=text]{background:#0c1526;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-family:inherit;font-size:14px;width:100%}
+  textarea{resize:vertical}
+  .drop{border:2px dashed var(--border);border-radius:12px;padding:26px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+  .drop.over{border-color:var(--accent);background:#0e1830;color:var(--text)}
+  .slides{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .slide{display:flex;gap:12px;background:#0e1830;border:1px solid var(--border);border-radius:10px;padding:10px}
+  .slide .thumb{width:84px;height:84px;border-radius:8px;object-fit:cover;flex:0 0 auto;background:#000}
+  .slide .meta{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
+  .mini{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .ord{display:flex;flex-direction:column;gap:4px;flex:0 0 auto}
+  .sw{width:22px;height:22px;border-radius:50%;border:2px solid #2a3a5c;cursor:pointer;padding:0}
+  .grid{display:grid;gap:18px;grid-template-columns:1fr}
+  @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:14px;color:var(--muted)}
+  .frame{background:#000;border-radius:10px;overflow:hidden;display:flex;justify-content:center}
+  .frame svg{width:100%;height:auto;display:block}
+  .frame.story{max-width:240px;margin:0 auto}
+  .sectit{grid-column:1/-1;font-weight:800;font-size:16px;margin:6px 0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  .empty{color:var(--muted);text-align:center;padding:30px;grid-column:1/-1}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+  a.back{color:var(--accent);text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row spread">
+    <div>
+      <h1>🎨 אולפן יצירה</h1>
+      <div class="sub">העלה תמונות → קבל קרוסלה לאינסטגרם ו/או סטורי אנכי, ממותג ומוכן לשיתוף.</div>
+    </div>
+    <a class="back" href="index.html">→ חזרה לכלי</a>
+  </div>
+
+  <!-- העלאה -->
+  <div class="panel">
+    <div class="drop" id="drop">
+      📥 <b>גרור לכאן תמונות</b> או לחץ לבחירה (אפשר כמה בבת אחת)
+      <input type="file" id="file" accept="image/*" multiple hidden>
+    </div>
+    <div class="hint">התמונות נשמרות מקומית בדפדפן שלך בלבד (לא מועלות לשרת). הדף עובד גם מקובץ מקומי.</div>
+  </div>
+
+  <!-- הגדרות כלליות -->
+  <div class="panel">
+    <div class="row" style="gap:18px">
+      <label><input type="checkbox" id="fSquare" checked> 📱 קרוסלה (ריבוע 1080×1080)</label>
+      <label><input type="checkbox" id="fStory" checked> 📖 סטורי (אנכי 1080×1920)</label>
+      <label><input type="checkbox" id="fCta" checked> 🚀 הוסף שקופית סיום (CTA)</label>
+    </div>
+    <div id="ctaBox" style="margin-top:10px">
+      <label>טקסט שקופית הסיום (שורה לכל שורה):</label>
+      <textarea id="ctaText" rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- עורך השקופיות -->
+  <div class="panel">
+    <div class="row spread">
+      <b>השקופיות שלך (<span id="cnt">0</span>)</b>
+      <button class="btn ghost sm" id="clearAll">🗑️ נקה הכל</button>
+    </div>
+    <div class="slides" id="editor"></div>
+  </div>
+
+  <!-- הורדה -->
+  <div class="panel row" style="gap:10px">
+    <button class="btn" id="dlSquares">📱 הורד את כל הקרוסלה</button>
+    <button class="btn cyan" id="dlStories">📖 הורד את כל הסטורי</button>
+    <span class="hint" style="margin:0">הורדה אחת-אחת זמינה גם מתחת לכל שקופית בתצוגה למטה.</span>
+  </div>
+
+  <!-- תצוגה מקדימה -->
+  <div class="grid" id="preview"></div>
+</div>
+
+<script>
+const C={bg1:'#0b1220',bg2:'#16233d',accent:'#60a5fa',cyan:'#22d3ee',text:'#e6edf7',muted:'#9fb3d1'};
+const SWATCHES=['#e6edf7','#60a5fa','#22d3ee','#34d399','#f59e0b'];
+
+// ---------- state ----------
+function fresh(){return {slides:[],square:true,story:true,cta:{on:true,lines:['🚀 דמו חינם 3 ימים','בלי כרטיס אשראי','veribayit.com']}};}
+function load(){try{const r=JSON.parse(localStorage.getItem('vb_studio_v1'));if(r&&Array.isArray(r.slides))return r;}catch(e){}return fresh();}
+function save(){try{localStorage.setItem('vb_studio_v1',JSON.stringify(S));}catch(e){alert('האחסון מלא — מחק כמה שקופיות.');}}
+let S=load();
+const uid=()=>'s'+Math.random().toString(36).slice(2,9);
+
+// ---------- העלאת קבצים → dataURL מוקטן ----------
+function fileToData(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      const max=1280; let w=img.naturalWidth||1000,h=img.naturalHeight||1000;
+      if(Math.max(w,h)>max){ if(w>=h){h=Math.round(h*max/w);w=max;} else {w=Math.round(w*max/h);h=max;} }
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      try{res(c.toDataURL('image/jpeg',0.85));}catch(e){rej(e);}
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load failed'));};
+    img.src=url;
+  });
+}
+async function addFiles(list){
+  const files=[...list].filter(f=>f.type.startsWith('image/'));
+  for(const f of files){
+    try{ const data=await fileToData(f); S.slides.push({id:uid(),img:data,cap:'',pos:'bottom',color:C.text}); }
+    catch(e){ console.warn('skip',f.name,e); }
+  }
+  save(); renderEditor(); renderPreview();
+}
+
+// ---------- מנוע SVG (שימוש חוזר מהקרוסלה) ----------
+const SVGH='<svg id="ID" viewBox="0 0 W H" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
+function sq(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H',1080)+inner+'</svg>';}
+function st(id,inner){return SVGH.replace('ID',id).replace('W',1080).replace('H',1920)+inner+'</svg>';}
+function shotFit(idp,w,h,data){
+  return `<defs><filter id="${idp}bl" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="26"/></filter></defs>
+    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" filter="url(#${idp}bl)"/>
+    <rect x="0" y="0" width="${w}" height="${h}" fill="#070c18" opacity="0.45"/>
+    <image href="${data}" xlink:href="${data}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`;
+}
+function scrim(idp,w,h,pos){
+  const top=pos==='top';
+  const hh=Math.round(h*0.40), y=top?0:h-hh;
+  return `<defs><linearGradient id="${idp}sc" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#070c18" stop-opacity="${top?0.85:0}"/>
+    <stop offset="1" stop-color="#070c18" stop-opacity="${top?0:0.85}"/></linearGradient></defs>
+    <rect x="0" y="${y}" width="${w}" height="${hh}" fill="url(#${idp}sc)"/>`;
+}
+function lines(cx,y,arr,size,weight,fill,lh){let s=`<text x="${cx}" y="${y}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="${weight}" font-size="${size}" fill="${fill}" style="direction:rtl">`;arr.forEach((t,i)=>{s+=`<tspan x="${cx}" dy="${i===0?0:lh}">${esc(t)}</tspan>`;});return s+'</text>';}
+function dots(cx,cy,active,n){if(n<2)return '';let s='';for(let i=0;i<n;i++){const x=cx-(n-1)*22+i*44;s+=`<circle cx="${x}" cy="${cy}" r="${i===active?9:6}" fill="${i===active?C.accent:'#33405e'}"/>`;}return s;}
+function wordmark(cx,cy,size){return `<text x="${cx}" y="${cy}" text-anchor="middle" font-family="Heebo,Arial,sans-serif" font-weight="800" font-size="${size}" letter-spacing="1"><tspan fill="${C.text}">Veri</tspan><tspan fill="${C.accent}">Bayit</tspan></text>`;}
+function bg(id,w,h){return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${C.bg2}"/><stop offset="1" stop-color="${C.bg1}"/></linearGradient><radialGradient id="${id}r" cx="0.85" cy="0.12" r="0.9"><stop offset="0" stop-color="rgba(96,165,250,0.20)"/><stop offset="1" stop-color="rgba(96,165,250,0)"/></radialGradient></defs><rect width="${w}" height="${h}" fill="url(#${id})"/><rect width="${w}" height="${h}" fill="url(#${id}r)"/>`;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ---------- בניית שקופית ----------
+function caption(idp,w,h,sl,story){
+  const arr=(sl.cap||'').split('\n').map(x=>x.trim()).filter(x=>x.length);
+  if(!arr.length) return '';
+  const size=story?62:54, lh=Math.round(size*1.3);
+  const cx=w/2; let y, scr=scrim(idp,w,h,sl.pos);
+  if(sl.pos==='top'){ y=story?225:150; }
+  else { const base=h-(story?255:150); y=base-(arr.length-1)*lh; }
+  return scr+lines(cx,y,arr,size,800,sl.color||C.text,lh);
+}
+function buildOne(domId,sl,idx,total,story){
+  const w=1080,h=story?1920:1080;
+  const dotY=story?h-150:h-58;
+  const inner=shotFit(domId,w,h,sl.img)+caption(domId,w,h,sl,story)+dots(w/2,dotY,idx,total);
+  return (story?st:sq)(domId,inner);
+}
+function buildCta(domId,idx,total,story){
+  const w=1080,h=story?1920:1080,cx=w/2;
+  const arr=S.cta.lines.map(x=>x.trim()).filter(x=>x.length);
+  const size=story?72:62, lh=Math.round(size*1.42);
+  const blockY=(story?h*0.46:h*0.44)-(arr.length-1)*lh/2;
+  const dotY=story?h-150:h-58;
+  const inner=bg(domId+'g',w,h)+wordmark(cx,story?h*0.30:h*0.26,story?78:66)
+    +lines(cx,blockY,arr,size,800,C.text,lh)+dots(cx,dotY,idx,total);
+  return (story?st:sq)(domId,inner);
+}
+
+// ---------- עורך ----------
+function renderEditor(){
+  document.getElementById('cnt').textContent=S.slides.length;
+  const ed=document.getElementById('editor');
+  if(!S.slides.length){ ed.innerHTML='<div class="empty">אין שקופיות עדיין — העלה תמונות למעלה.</div>'; return; }
+  ed.innerHTML=S.slides.map((sl,i)=>{
+    const sw=SWATCHES.map(c=>`<button class="sw" data-act="color" data-id="${sl.id}" data-c="${c}" style="background:${c};${c===sl.color?'border-color:#fff':''}" title="${c}"></button>`).join('');
+    return `<div class="slide" data-id="${sl.id}">
+      <img class="thumb" src="${sl.img}" alt="">
+      <div class="meta">
+        <textarea data-act="cap" data-id="${sl.id}" rows="2" placeholder="כיתוב (אופציונלי) — שורה לכל שורה">${esc(sl.cap||'')}</textarea>
+        <div class="mini">
+          <label>מיקום:</label>
+          <select data-act="pos" data-id="${sl.id}" style="width:auto">
+            <option value="bottom" ${sl.pos==='bottom'?'selected':''}>למטה</option>
+            <option value="top" ${sl.pos==='top'?'selected':''}>למעלה</option>
+          </select>
+          <label>צבע:</label> ${sw}
+        </div>
+      </div>
+      <div class="ord">
+        <button class="btn ghost sm" data-act="up" data-id="${sl.id}" ${i===0?'disabled':''}>▲</button>
+        <button class="btn ghost sm" data-act="down" data-id="${sl.id}" ${i===S.slides.length-1?'disabled':''}>▼</button>
+        <button class="btn danger sm" data-act="del" data-id="${sl.id}">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let previewTimer=null;
+function schedulePreview(){clearTimeout(previewTimer);previewTimer=setTimeout(renderPreview,250);}
+
+function renderPreview(){
+  const pv=document.getElementById('preview');
+  if(!S.slides.length){ pv.innerHTML='<div class="empty">📷 העלה תמונות כדי לראות תצוגה מקדימה.</div>'; updateDlButtons(); return; }
+  const total=S.slides.length+(S.cta.on?1:0);
+  let html='';
+  if(S.square){
+    html+=`<div class="sectit">📱 קרוסלה (1080×1080)</div>`;
+    S.slides.forEach((sl,i)=>{ const id='q'+i; html+=card(id,buildOne(id,sl,i,total,false),`שקופית ${i+1}`,'veribayit-post-'+(i+1)+'.png',1080,1080); });
+    if(S.cta.on){ const id='qC'; html+=card(id,buildCta(id,S.slides.length,total,false),'שקופית סיום','veribayit-post-cta.png',1080,1080); }
+  }
+  if(S.story){
+    html+=`<div class="sectit">📖 סטורי (1080×1920)</div>`;
+    S.slides.forEach((sl,i)=>{ const id='r'+i; html+=card(id,buildOne(id,sl,i,total,true),`סטורי ${i+1}`,'veribayit-story-'+(i+1)+'.png',1080,1920,true); });
+    if(S.cta.on){ const id='rC'; html+=card(id,buildCta(id,S.slides.length,total,true),'סטורי סיום','veribayit-story-cta.png',1080,1920,true); }
+  }
+  if(!S.square&&!S.story) html='<div class="empty">בחר לפחות פורמט אחד (קרוסלה / סטורי) למעלה.</div>';
+  pv.innerHTML=html;
+  updateDlButtons();
+}
+function card(id,svg,title,fname,w,h,story){
+  return `<div class="card"><h3>${title} · ${w}×${h}</h3><div class="frame${story?' story':''}">${svg}</div>
+    <button class="btn sm" style="margin-top:8px" onclick="dl('${id}','${fname}',${w},${h})">📥 הורד PNG</button></div>`;
+}
+function updateDlButtons(){
+  const has=S.slides.length>0;
+  document.getElementById('dlSquares').disabled=!(has&&S.square);
+  document.getElementById('dlStories').disabled=!(has&&S.story);
+}
+
+// ---------- ייצוא PNG ----------
+function dl(svgId,name,w,h){
+  const svg=document.getElementById(svgId); if(!svg)return;
+  const xml=new XMLSerializer().serializeToString(svg);
+  const src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(xml)));
+  const img=new Image();
+  img.onload=function(){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.fillStyle='#0b1220';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);const a=document.createElement('a');a.download=name;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();};
+  img.onerror=function(){alert('הורדה נכשלה — נסה שוב.');};
+  img.src=src;
+}
+async function dlAll(prefix,fname,w,h){
+  const n=S.slides.length+(S.cta.on?1:0);
+  for(let i=0;i<S.slides.length;i++){ dl(prefix+i,fname+'-'+(i+1)+'.png',w,h); await wait(600); }
+  if(S.cta.on){ dl(prefix+'C',fname+'-cta.png',w,h); await wait(600); }
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ---------- wiring ----------
+const drop=document.getElementById('drop'),file=document.getElementById('file');
+drop.onclick=()=>file.click();
+file.onchange=e=>{addFiles(e.target.files);file.value='';};
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
+
+document.getElementById('editor').addEventListener('input',e=>{
+  const t=e.target,id=t.dataset.id,act=t.dataset.act; if(!id)return;
+  const sl=S.slides.find(x=>x.id===id); if(!sl)return;
+  if(act==='cap'){ sl.cap=t.value; save(); schedulePreview(); }
+});
+document.getElementById('editor').addEventListener('change',e=>{
+  const t=e.target,id=t.dataset.id,act=t.dataset.act; if(!id)return;
+  const sl=S.slides.find(x=>x.id===id); if(!sl)return;
+  if(act==='pos'){ sl.pos=t.value; save(); renderPreview(); }
+});
+document.getElementById('editor').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b)return; const id=b.dataset.id,act=b.dataset.act;
+  const i=S.slides.findIndex(x=>x.id===id);
+  if(act==='del'){ S.slides.splice(i,1); save(); renderEditor(); renderPreview(); }
+  else if(act==='up'&&i>0){ [S.slides[i-1],S.slides[i]]=[S.slides[i],S.slides[i-1]]; save(); renderEditor(); renderPreview(); }
+  else if(act==='down'&&i<S.slides.length-1){ [S.slides[i+1],S.slides[i]]=[S.slides[i],S.slides[i+1]]; save(); renderEditor(); renderPreview(); }
+  else if(act==='color'){ S.slides[i].color=b.dataset.c; save(); renderEditor(); renderPreview(); }
+});
+document.getElementById('clearAll').onclick=()=>{ if(S.slides.length&&confirm('למחוק את כל השקופיות?')){ S.slides=[]; save(); renderEditor(); renderPreview(); } };
+
+document.getElementById('fSquare').onchange=e=>{S.square=e.target.checked;save();renderPreview();};
+document.getElementById('fStory').onchange=e=>{S.story=e.target.checked;save();renderPreview();};
+document.getElementById('fCta').onchange=e=>{S.cta.on=e.target.checked;document.getElementById('ctaBox').style.display=e.target.checked?'':'none';save();renderPreview();};
+document.getElementById('ctaText').addEventListener('input',e=>{S.cta.lines=e.target.value.split('\n');save();schedulePreview();});
+document.getElementById('dlSquares').onclick=()=>dlAll('q','veribayit-post',1080,1080);
+document.getElementById('dlStories').onclick=()=>dlAll('r','veribayit-story',1080,1920);
+
+// ---------- init ----------
+document.getElementById('fSquare').checked=S.square;
+document.getElementById('fStory').checked=S.story;
+document.getElementById('fCta').checked=S.cta.on;
+document.getElementById('ctaBox').style.display=S.cta.on?'':'none';
+document.getElementById('ctaText').value=S.cta.lines.join('\n');
+renderEditor(); renderPreview();
+</script>
+</body>
+</html>
