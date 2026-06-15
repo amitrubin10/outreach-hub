@@ -531,10 +531,7 @@ function vDash(){
 let groupSort='priority';
 function vGroups(){
   const p=P();
-  const quick=p.templates.length?`<div class="card"><div class="row spread"><b>💬 תגובות מהירות</b><button class="btn sm ghost" onclick="go('templates')">נהל</button></div>
-    <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
-      ${p.templates.map(t=>`<div class="row spread" style="gap:8px"><span class="small">${esc(t.title)}</span><button class="btn sm" onclick="copyTpl('${t.id}')">📋 העתק</button></div>`).join('')}
-    </div></div>`:'';
+  const quick='';  // פאנל "תגובות מהירות" הוסר
   if(!p.groups.length) return quick+`
     <div class="row spread"><b>הקבוצות של ${esc(p.name)}</b><button class="btn" onclick="editGroup()">➕ הוסף קבוצה</button></div>
     <div class="card empty">עוד אין קבוצות בפרויקט הזה. לחץ "➕ הוסף קבוצה" והדבק שם + קישור לקבוצה בפייסבוק.</div>`;
