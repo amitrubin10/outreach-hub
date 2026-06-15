@@ -224,12 +224,12 @@ function renderPreview(){
   let html='';
   if(S.square){
     html+=`<div class="sectit">📱 קרוסלה (1080×1080)</div>`;
-    S.slides.forEach((sl,i)=>{ const id='q'+i; html+=card(id,buildOne(id,sl,i,total,false),`שקופית ${i+1}`,'veribayit-post-'+(i+1)+'.png',1080,1080); });
+    S.slides.forEach((sl,i)=>{ const id='q'+i; html+=cardSlide(id,buildOne(id,sl,i,total,false),`שקופית ${i+1}`,'veribayit-post-'+(i+1),1080,1080,i,false); });
     if(S.cta.on){ const id='qC'; html+=card(id,buildCta(id,S.slides.length,total,false),'שקופית סיום','veribayit-post-cta.png',1080,1080); }
   }
   if(S.story){
     html+=`<div class="sectit">📖 סטורי (1080×1920)</div>`;
-    S.slides.forEach((sl,i)=>{ const id='r'+i; html+=card(id,buildOne(id,sl,i,total,true),`סטורי ${i+1}`,'veribayit-story-'+(i+1)+'.png',1080,1920,true); });
+    S.slides.forEach((sl,i)=>{ const id='r'+i; html+=cardSlide(id,buildOne(id,sl,i,total,true),`סטורי ${i+1}`,'veribayit-story-'+(i+1),1080,1920,i,true); });
     if(S.cta.on){ const id='rC'; html+=card(id,buildCta(id,S.slides.length,total,true),'סטורי סיום','veribayit-story-cta.png',1080,1920,true); }
   }
   if(!S.square&&!S.story) html='<div class="empty">בחר לפחות פורמט אחד (קרוסלה / סטורי) למעלה.</div>';
@@ -240,6 +240,13 @@ function card(id,svg,title,fname,w,h,story){
   return `<div class="card"><h3>${title} · ${w}×${h}</h3><div class="frame${story?' story':''}">${svg}</div>
     <button class="btn sm" style="margin-top:8px" onclick="dl('${id}','${fname}',${w},${h})">📥 הורד PNG</button></div>`;
 }
+function cardSlide(id,svg,title,fbase,w,h,idx,story){
+  return `<div class="card"><h3>${title} · ${w}×${h}</h3><div class="frame${story?' story':''}">${svg}</div>
+    <div class="row" style="gap:8px;margin-top:8px">
+      <button class="btn sm" onclick="dl('${id}','${fbase}.png',${w},${h})">📥 עם כיתוב</button>
+      <button class="btn sm ghost" onclick="dlClean(${idx},${story})" title="התמונה בלבד — בלי כיתוב ובלי נקודות">🧹 נקייה</button>
+    </div></div>`;
+}
 function updateDlButtons(){
   const has=S.slides.length>0;
   document.getElementById('dlSquares').disabled=!(has&&S.square);
@@ -247,15 +254,16 @@ function updateDlButtons(){
 }
 
 // ---------- ייצוא PNG ----------
-function dl(svgId,name,w,h){
-  const svg=document.getElementById(svgId); if(!svg)return;
-  const xml=new XMLSerializer().serializeToString(svg);
+function dlSvg(xml,name,w,h){
   const src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(xml)));
   const img=new Image();
   img.onload=function(){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.fillStyle='#0b1220';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);const a=document.createElement('a');a.download=name;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();};
   img.onerror=function(){alert('הורדה נכשלה — נסה שוב.');};
   img.src=src;
 }
+function dl(svgId,name,w,h){ const svg=document.getElementById(svgId); if(!svg)return; dlSvg(new XMLSerializer().serializeToString(svg),name,w,h); }
+// הורדה נקייה — התמונה מותאמת לפורמט (מילוי מטושטש) בלי כיתוב ובלי נקודות
+function dlClean(i,story){ const sl=S.slides[i]; if(!sl)return; const w=1080,h=story?1920:1080; const xml=(story?st:sq)('cln',shotFit('cln',w,h,sl.img)); dlSvg(xml,'veribayit-'+(story?'story':'post')+'-'+(i+1)+'-clean.png',w,h); }
 async function dlAll(prefix,fname,w,h){
   const n=S.slides.length+(S.cta.on?1:0);
   for(let i=0;i<S.slides.length;i++){ dl(prefix+i,fname+'-'+(i+1)+'.png',w,h); await wait(600); }
