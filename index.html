@@ -123,8 +123,6 @@
     <button class="tab" data-t="groups">👥 קבוצות</button>
     <button class="tab" data-t="posts">📌 פוסטים</button>
     <button class="tab" data-t="leads">👤 לידים</button>
-    <button class="tab" data-t="templates">💬 תגובות</button>
-    <button class="tab" data-t="studio">✍️ סטודיו פוסטים</button>
     <button class="tab" data-t="media">📣 מדיה</button>
     <button class="tab" data-t="backup">⚙️ הגדרות</button>
   </div>
@@ -425,6 +423,7 @@ function gName(id){const g=P().groups.find(x=>x.id===id);return g?g.name:'—';}
 // ============================================================
 function render(){
   dailyReset();
+  if(['templates','studio'].includes(state.meta.activeTab)) state.meta.activeTab='posts';
   renderSyncBar();
   // בר פרויקטים
   document.getElementById('pjtbar').innerHTML=
@@ -432,7 +431,7 @@ function render(){
     +`<button class="pjt add" onclick="addProject()">➕ פרויקט</button>`;
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.t===state.meta.activeTab));
   document.getElementById('content').innerHTML=
-    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,studio:vStudio,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
+    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
 }
 
 // ---- פרויקטים ----
@@ -573,7 +572,8 @@ function vPosts(){
       ${x.notes?`<div class="muted small" style="margin-top:6px">📝 ${esc(x.notes)}</div>`:''}</div>`;
   }).join(''):'<div class="card empty">אין פוסטים בסינון הזה.</div>';
   const f=(v,l)=>`<button class="chip" style="${postFilter===v?'background:var(--accent);color:#06122a;border-color:var(--accent)':''}" onclick="postFilter='${v}';render()">${l}</button>`;
-  return `<div class="row spread"><b>מעקב פוסטים (${p.posts.length})</b><button class="btn" onclick="editPost()">➕ הוסף פוסט</button></div>
+  return `${vInbox()}
+    <div class="row spread" style="margin-top:18px"><b>מעקב פוסטים (${p.posts.length})</b><button class="btn" onclick="editPost()">➕ הוסף פוסט</button></div>
     <div class="row" style="gap:6px;margin:10px 0 14px">${f('all','הכל')}${f('todo','לטיפול')}${f('replied','הגבתי')}${f('irrelevant','לא רלוונטי')}</div>${items}`;
 }
 function editPost(id){
@@ -738,14 +738,7 @@ function vMedia(){
         📱 <b>קרוסלה לאינסטגרם</b> — 7 שקופיות מרובעות (1080×1080), לפוסט בסדר 1→7.<br>
         📖 <b>גרסאות סטורי</b> — 7 שקופיות אנכיות מלא-מסך (1080×1920), כל אחת בנפרד.
       </p>
-      <div class="row" style="gap:10px;flex-wrap:wrap">
-        <a class="btn" href="studio.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🎨 אולפן יצירה — העלה תמונות שלך ←</a>
-        <a class="btn ghost" href="carousel.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🚀 הקרוסלה המוכנה של VeriBayit ←</a>
-      </div>
-    </div>
-    <div class="card">
-      <b>🎨 אולפן יצירה</b>
-      <p class="muted small" style="margin:6px 0 0;line-height:1.7">העלה תמונות משלך → קבל קרוסלה לאינסטגרם וגם גרסאות סטורי אנכיות, ממותגות עם כיתוב — מוכן לשיתוף בעמוד שלך.</p>
+      <a class="btn" href="carousel.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🚀 פתח את הקרוסלה המוכנה ←</a>
     </div>
     <div class="card empty small">💡 כל שקופית ניתנת להורדה בנפרד, או "הורד את כל הקרוסלה" / "הורד את כל הסטורי" בבת אחת.</div>`;
 }
