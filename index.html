@@ -717,13 +717,35 @@ function vStudio(){
       <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${starters}</div></div>
     ${items}`;
 }
+// ---- ייבוא פוסט ידני (הדבקה מהסוכן) ----
+function importInboxPost(){
+  if(!cloudUser){ toast('התחבר קודם'); return; }
+  const imgOpts=[{v:'',l:'— בלי תמונה —'}].concat(
+    mediaAssets.filter(m=>m.kind==='image').map(m=>({v:m.url,l:(m.tag||m.name||'תמונה')})));
+  showForm('➕ ייבוא פוסט מהסוכן',[
+    {key:'body',label:'תוכן הפוסט (הדבק מהסוכן)',type:'textarea',rows:10},
+    {key:'image',label:'תמונה מהמאגר',type:'select',options:imgOpts},
+    {key:'title',label:'כותרת לזיהוי (אופציונלי)',ph:'נושא 2 — בנק'},
+    {key:'angle',label:'זווית (אופציונלי)',ph:'יתרון'}
+  ],{},async o=>{
+    if(!o.body){ toast('צריך תוכן פוסט'); return; }
+    const sel=mediaAssets.find(m=>m.url===o.image);
+    try{
+      await window.__sb.from('pending_posts').insert({owner:cloudUser.id,body:o.body,
+        title:o.title||null,angle:o.angle||null,image_url:o.image||null,
+        image_hint:sel?(sel.tag||null):null,status:'pending'});
+      await fetchPending(); render(); toast('נוסף לתיבת הנכנס ✓');
+    }catch(e){ toast('שגיאה בהוספה'); }
+  });
+}
 // ---- תצוגת תיבת הנכנס מהסוכן ----
 function vInbox(){
   if(!cloudUser) return `<div class="card empty small">📥 התחבר לסנכרון (☁️ למעלה) כדי לראות פוסטים שהסוכן שלח אוטומטית.</div>`;
   const pend=pendingPosts.filter(x=>x.status==='pending');
   const pub=pendingPosts.filter(x=>x.status==='published');
   let h=`<div class="card"><div class="row spread"><b>📥 פוסטים נכנסים מהסוכן (${pend.length})</b>
-    <button class="btn sm ghost" onclick="refreshInbox()">↻ בדוק נכנסים</button></div>`;
+    <div class="row" style="gap:6px"><button class="btn sm" onclick="importInboxPost()">➕ ייבוא פוסט</button>
+      <button class="btn sm ghost" onclick="refreshInbox()">↻ בדוק</button></div></div>`;
   h += pend.length
     ? pend.map(x=>inboxCard(x,true)).join('')
     : `<div class="muted small" style="margin-top:8px">אין פוסטים חדשים. כשהסוכן ישלח — יופיעו כאן.</div>`;
