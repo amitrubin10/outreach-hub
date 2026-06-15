@@ -280,7 +280,7 @@ function saveLocal(){ localStorage.setItem(KEY,JSON.stringify(state)); }
 function save(){ saveLocal(); cloudPush(); }
 
 // ===== סנכרון ענן (Supabase) — לקוח ה-SB נטען ע"י <script type="module"> בתחתית =====
-let cloudUser=null, _pushTimer=null, pendingPosts=[];
+let cloudUser=null, _pushTimer=null, pendingPosts=[], mediaAssets=[];
 window.__cloudInit=async function(){
   if(!window.__sb) return;
   window.__sb.auth.onAuthStateChange((_e,session)=>{ cloudUser=session?session.user:null; renderSyncBar(); });
@@ -293,7 +293,41 @@ async function cloudPullOrSeed(){
   if(error){ toast('שגיאת טעינה מהענן'); return; }
   if(data && data.data && data.data.projects){ state=prep(data.data); saveLocal(); toast('נטען מהענן ✓'); }
   else { cloudPush(true); }   // הענן ריק → מזריקים את המצב המקומי
-  await fetchPending(); render();
+  await fetchPending(); await fetchMedia(); render();
+}
+// ---- מאגר מדיה (media_assets + Supabase Storage) ----
+async function fetchMedia(){
+  if(!window.__sb||!cloudUser){ mediaAssets=[]; return; }
+  try{
+    const { data, error }=await window.__sb.from('media_assets').select('*').order('created_at',{ascending:false});
+    mediaAssets=(!error&&data)?data:[];
+  }catch(e){ mediaAssets=[]; }
+}
+function onMediaPick(input){
+  const f=input.files&&input.files[0]; if(f){ uploadMedia(f); } input.value='';
+}
+async function uploadMedia(file){
+  if(!window.__sb||!cloudUser){ toast('התחבר קודם'); return; }
+  const kind=file.type.startsWith('video')?'video':'image';
+  const safe=file.name.replace(/[^\w.\-]+/g,'_');
+  const path=cloudUser.id+'/'+Date.now()+'_'+safe;
+  toast('מעלה…');
+  try{
+    const { error:upErr }=await window.__sb.storage.from('media').upload(path,file,{upsert:false});
+    if(upErr){ toast('העלאה נכשלה: '+upErr.message); return; }
+    const url=window.__sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+    await window.__sb.from('media_assets').insert({owner:cloudUser.id,kind,path,url,name:file.name,tag:'',description:''});
+    await fetchMedia(); render(); toast('הועלה ✓');
+  }catch(e){ toast('שגיאה בהעלאה'); }
+}
+async function setMediaField(id,field,val){
+  try{ await window.__sb.from('media_assets').update({[field]:val}).eq('id',id); }catch(e){}
+  const m=mediaAssets.find(x=>x.id===id); if(m) m[field]=val; toast('נשמר ✓');
+}
+async function delMedia(id,path){
+  if(!confirm('למחוק את הקובץ הזה מהמאגר?')) return;
+  try{ await window.__sb.storage.from('media').remove([path]); await window.__sb.from('media_assets').delete().eq('id',id); }catch(e){}
+  await fetchMedia(); render();
 }
 // ---- תיבת נכנס: פוסטים מהסוכן (pending_posts) ----
 async function fetchPending(){
@@ -705,6 +739,7 @@ function inboxCard(x,isPending){
     <div class="row spread"><b>${esc(x.title||'פוסט')}</b>
       <span class="muted small">${x.angle?esc(x.angle)+' · ':''}${esc((x.created_at||'').slice(0,10))}</span></div>
     <pre class="body" style="white-space:pre-wrap">${esc(x.body)}</pre>
+    ${x.image_url?`<img src="${esc(x.image_url)}" style="max-width:180px;border-radius:8px;margin-top:6px;display:block">`:''}
     ${x.image_hint?`<div class="muted small">🖼️ תמונה מומלצת: ${esc(x.image_hint)}</div>`:''}
     <div class="row" style="gap:6px;margin-top:8px">
       <button class="btn sm" onclick="copyInbox('${x.id}')">📋 העתק</button>
@@ -740,7 +775,34 @@ function vMedia(){
       </p>
       <a class="btn" href="carousel.html" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🚀 פתח את הקרוסלה המוכנה ←</a>
     </div>
-    <div class="card empty small">💡 כל שקופית ניתנת להורדה בנפרד, או "הורד את כל הקרוסלה" / "הורד את כל הסטורי" בבת אחת.</div>`;
+    <div class="card empty small">💡 כל שקופית ניתנת להורדה בנפרד, או "הורד את כל הקרוסלה" / "הורד את כל הסטורי" בבת אחת.</div>
+    ${vMediaLib()}`;
+}
+// ---- מאגר מדיה: תמונות + סרטונים ----
+function vMediaLib(){
+  if(!cloudUser) return `<div class="card empty small">🗂️ התחבר לסנכרון (☁️ למעלה) כדי להעלות ולנהל תמונות/סרטונים.</div>`;
+  const imgs=mediaAssets.filter(m=>m.kind==='image');
+  const vids=mediaAssets.filter(m=>m.kind==='video');
+  return `<div class="card">
+    <div class="row spread"><b>🗂️ מאגר מדיה (${mediaAssets.length})</b>
+      <label class="btn sm" style="cursor:pointer">⬆️ העלה קובץ<input type="file" accept="image/*,video/*" style="display:none" onchange="onMediaPick(this)"></label></div>
+    <div class="muted small" style="margin:6px 0 10px">תמונות וסרטונים לשימוש בפוסטים. תן לכל תמונה <b>תגית</b> קצרה (למשל "חיבור בנק") — לפיה הסוכן יבחר תמונה לפוסט השבועי.</div>
+    ${imgs.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${imgs.map(mediaCard).join('')}</div>`:'<div class="muted small">אין תמונות עדיין — לחץ "העלה קובץ".</div>'}
+    ${vids.length?`<div style="margin-top:16px"><b class="small">🎬 סרטונים (${vids.length})</b>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px">${vids.map(mediaCard).join('')}</div></div>`:''}
+  </div>`;
+}
+function mediaCard(m){
+  const media = m.kind==='video'
+    ? `<video src="${esc(m.url)}" controls preload="metadata" style="width:100%;border-radius:8px;background:#000"></video>`
+    : `<img src="${esc(m.url)}" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:8px;background:#000">`;
+  return `<div style="border:1px solid var(--border);border-radius:10px;padding:8px">
+    ${media}
+    <input type="text" placeholder="תגית (למשל: חיבור בנק)" value="${esc(m.tag||'')}" onchange="setMediaField('${m.id}','tag',this.value)" style="margin-top:6px;font-size:12px;width:100%">
+    <div class="row" style="gap:6px;margin-top:6px">
+      <button class="btn sm ghost" onclick="copyText('${esc(m.url)}')">📋 קישור</button>
+      <button class="btn sm danger-o" onclick="delMedia('${m.id}','${esc(m.path)}')">🗑️</button>
+    </div></div>`;
 }
 
 // ---- הגדרות וגיבוי ----
