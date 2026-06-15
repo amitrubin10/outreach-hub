@@ -184,6 +184,54 @@ const POST_STARTERS=[
   {label:'שאלה לקהילה',skel:'שאלה לכל הגזברים בקבוצה:\n\n[שאלה שמעוררת תגובות — איך אתם מנהלים את X?]\n\n[הקשר קצר + הזמנה לשתף]'},
 ];
 
+// קמפיין טפטוף — פוסט אחד לכל תמונה, כל כמה ימים. נטענים כטיוטות מוכנות לפרויקט VeriBayit.
+const CAMPAIGN_POSTS=[
+  {title:'קמפיין 1 · אקסל — הכאב', body:`😩 עדיין מנהלים את ועד הבית באקסל ובפתקים?
+
+מי שילם, מי לא, וכמה נשאר בקופה — בלאגן שחוזר כל חודש.
+יש דרך אחרת. 👇
+
+🌐 veribayit.com
+#ועד_בית #ניהול_בניין`},
+  {title:'קמפיין 2 · בנק — היתרון הגדול', body:`🏦 תכירו את הפיצ׳ר שמשנה הכל:
+
+VeriBayit מתחברת לדף הבנק ומזהה לבד כל תשלום — מי שילם, כמה, ולמי.
+בלי להזין ידנית. בלי לפספס.
+
+💬 רוצים לראות? https://wa.me/972527246200
+#גבייה #ועד_בית_חכם`},
+  {title:'קמפיין 3 · דשבורד — הכל במקום אחד', body:`📊 כל הבניין במסך אחד.
+
+תשלומים, יתרות, גבייה והתאמות — תמונת מצב מלאה בכל רגע, בלי לחפש.
+
+🌐 veribayit.com
+#ניהול_בניין #בית_משותף`},
+  {title:'קמפיין 4 · וואטסאפ — תזכורות', body:`📲 נגמרו השיחות המביכות של "מתי תשלם?"
+
+תזכורת תשלום יוצאת לדיירים אוטומטית — אתה לא צריך לרדוף אחרי אף אחד.
+
+💬 שאלות? כתבו לי: https://wa.me/972527246200
+#ועד_בית #גבייה`},
+  {title:'קמפיין 5 · ספקים', body:`🧾 חשמלאי, מעלית, ניקיון, גינון —
+
+כל הספקים, התשלומים והמסמכים מסודרים במקום אחד. סוף לחיפושים בטלפון.
+
+🌐 veribayit.com
+#ניהול_בניין #ועד_בית`},
+  {title:'קמפיין 6 · מובייל', body:`📱 מנהלים את הבניין מהכיס.
+
+מאשרים תשלום, בודקים יתרה, שולחים הודעה לדיירים — מכל מקום, בכמה לחיצות.
+
+🌐 veribayit.com
+#ועד_בית_חכם #נדלן`},
+  {title:'קמפיין 7 · תשלום — הסגירה', body:`💸 גבייה בלי ארנקים דיגיטליים ובלי עמלות סליקה — הכסף נשאר בחשבון הוועד.
+
+נסו בעצמכם, בלי התחייבות.
+🚀 3 ימים חינם, בלי כרטיס אשראי → veribayit.com
+💬 או בוואטסאפ: https://wa.me/972527246200
+#ועד_בית #גבייה #בית_משותף`},
+];
+
 // אם לתגובה אין kind (נתונים ישנים) — מסיקים: 📩 / "פרטי" / DM → private, אחרת public.
 function inferKind(t){return /📩|בפרטי|\bDM\b/.test(t.title||'')?'private':'public';}
 function normalize(st){
@@ -204,6 +252,12 @@ const MIGRATIONS={
     if(!vb.templates)vb.templates=[];
     const have=new Set(vb.templates.map(t=>t.title));
     SOCIAL_PROOF.forEach(t=>{ if(!have.has(t.title)) vb.templates.push({id:uid(),...t}); });
+  },
+  campaignDrip_v1(st){
+    const vb=(st.projects||[]).find(p=>p.id==='p_vb'); if(!vb)return;
+    if(!Array.isArray(vb.drafts))vb.drafts=[];
+    const have=new Set(vb.drafts.map(d=>d.title));
+    CAMPAIGN_POSTS.forEach(p=>{ if(!have.has(p.title)) vb.drafts.push({id:uid(),title:p.title,body:p.body,status:'draft',date:todayStr()}); });
   }
 };
 function applyMigrations(st){
