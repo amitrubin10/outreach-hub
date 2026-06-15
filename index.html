@@ -282,7 +282,7 @@ function saveLocal(){ localStorage.setItem(KEY,JSON.stringify(state)); }
 function save(){ saveLocal(); cloudPush(); }
 
 // ===== סנכרון ענן (Supabase) — לקוח ה-SB נטען ע"י <script type="module"> בתחתית =====
-let cloudUser=null, _pushTimer=null;
+let cloudUser=null, _pushTimer=null, pendingPosts=[];
 window.__cloudInit=async function(){
   if(!window.__sb) return;
   window.__sb.auth.onAuthStateChange((_e,session)=>{ cloudUser=session?session.user:null; renderSyncBar(); });
@@ -293,8 +293,29 @@ async function cloudPullOrSeed(){
   if(!window.__sb||!cloudUser) return;
   const { data, error }=await window.__sb.from('outreach_state').select('data').eq('user_id',cloudUser.id).maybeSingle();
   if(error){ toast('שגיאת טעינה מהענן'); return; }
-  if(data && data.data && data.data.projects){ state=prep(data.data); saveLocal(); render(); toast('נטען מהענן ✓'); }
+  if(data && data.data && data.data.projects){ state=prep(data.data); saveLocal(); toast('נטען מהענן ✓'); }
   else { cloudPush(true); }   // הענן ריק → מזריקים את המצב המקומי
+  await fetchPending(); render();
+}
+// ---- תיבת נכנס: פוסטים מהסוכן (pending_posts) ----
+async function fetchPending(){
+  if(!window.__sb||!cloudUser){ pendingPosts=[]; return; }
+  try{
+    const { data, error }=await window.__sb.from('pending_posts').select('*').order('created_at',{ascending:false});
+    pendingPosts = (!error && data) ? data : [];
+  }catch(e){ pendingPosts=[]; }
+}
+async function refreshInbox(){ await fetchPending(); render(); toast('עודכן ✓'); }
+function copyInbox(id){ const it=pendingPosts.find(p=>p.id===id); if(it) copyText(it.body); }
+async function markPublished(id){
+  if(!window.__sb) return;
+  try{ await window.__sb.from('pending_posts').update({status:'published'}).eq('id',id); }catch(e){}
+  await fetchPending(); render(); toast('סומן כפורסם ✓');
+}
+async function delPending(id){
+  if(!confirm('למחוק את הפוסט הזה?')) return;
+  try{ await window.__sb.from('pending_posts').delete().eq('id',id); }catch(e){}
+  await fetchPending(); render();
 }
 function cloudPush(immediate){
   if(!window.__sb||!cloudUser) return;
@@ -659,10 +680,37 @@ function vStudio(){
           <button class="btn sm danger-o" onclick="delItem('drafts','${d.id}')">🗑️</button></div></div>
       <pre class="body">${esc(d.body)}</pre></div>`;
   }).join(''):'<div class="card empty">אין טיוטות. בחר "רעיון לפתיחה" למעלה, או "➕ פוסט חדש".</div>';
-  return `<div class="row spread"><b>סטודיו פוסטים — ${esc(p.name)}</b><button class="btn" onclick="editDraft()">➕ פוסט חדש</button></div>
+  return `${vInbox()}
+    <div class="row spread"><b>סטודיו פוסטים — ${esc(p.name)}</b><button class="btn" onclick="editDraft()">➕ פוסט חדש</button></div>
     <div class="card"><b class="small muted">💡 רעיונות לפתיחה (לחיצה יוצרת טיוטה עם שלד):</b>
       <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${starters}</div></div>
     ${items}`;
+}
+// ---- תצוגת תיבת הנכנס מהסוכן ----
+function vInbox(){
+  if(!cloudUser) return `<div class="card empty small">📥 התחבר לסנכרון (☁️ למעלה) כדי לראות פוסטים שהסוכן שלח אוטומטית.</div>`;
+  const pend=pendingPosts.filter(x=>x.status==='pending');
+  const pub=pendingPosts.filter(x=>x.status==='published');
+  let h=`<div class="card"><div class="row spread"><b>📥 פוסטים נכנסים מהסוכן (${pend.length})</b>
+    <button class="btn sm ghost" onclick="refreshInbox()">↻ בדוק נכנסים</button></div>`;
+  h += pend.length
+    ? pend.map(x=>inboxCard(x,true)).join('')
+    : `<div class="muted small" style="margin-top:8px">אין פוסטים חדשים. כשהסוכן ישלח — יופיעו כאן.</div>`;
+  h += `</div>`;
+  if(pub.length) h+=`<details class="card"><summary style="cursor:pointer;font-weight:700">✅ פורסמו מהסוכן (${pub.length})</summary>${pub.map(x=>inboxCard(x,false)).join('')}</details>`;
+  return h;
+}
+function inboxCard(x,isPending){
+  return `<div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:8px">
+    <div class="row spread"><b>${esc(x.title||'פוסט')}</b>
+      <span class="muted small">${x.angle?esc(x.angle)+' · ':''}${esc((x.created_at||'').slice(0,10))}</span></div>
+    <pre class="body" style="white-space:pre-wrap">${esc(x.body)}</pre>
+    ${x.image_hint?`<div class="muted small">🖼️ תמונה מומלצת: ${esc(x.image_hint)}</div>`:''}
+    <div class="row" style="gap:6px;margin-top:8px">
+      <button class="btn sm" onclick="copyInbox('${x.id}')">📋 העתק</button>
+      ${isPending?`<button class="btn sm" onclick="markPublished('${x.id}')">✅ סמן כפורסם</button>`:''}
+      <button class="btn sm danger-o" onclick="delPending('${x.id}')">🗑️</button>
+    </div></div>`;
 }
 function newDraftFrom(i){
   const s=POST_STARTERS[i];const p=P();
