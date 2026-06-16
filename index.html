@@ -124,6 +124,7 @@
     <button class="tab" data-t="posts">📌 פוסטים</button>
     <button class="tab" data-t="leads">👤 לידים</button>
     <button class="tab" data-t="templates">💬 תגובות</button>
+    <button class="tab" data-t="wa">🟢 הודעות וואטסאפ</button>
     <button class="tab" data-t="media">📣 מדיה</button>
     <button class="tab" data-t="backup">⚙️ הגדרות</button>
   </div>
@@ -239,6 +240,22 @@ function normalize(st){
 }
 // מיגרציות חד-פעמיות — רצות פעם אחת ומסומנות ב-meta.migrations.
 // כך תגובות חדשות מגיעות לנתונים קיימים, אבל מה שמחקת/ערכת — נשאר.
+const WA_SEED=[{title:'פוסט כללי — קבוצת גזברים', body:`אחד הדברים הכי לא נעימים בתפקיד זה להזכיר לשכנים לשלם — ולא תמיד להיות בטוחים מי כבר שילם ומי לא.
+ואם כבר מישהו שואל כמה הוא חייב ועל איזה חודש  -קשה עד בלתי אפשרי לענות בלי לפתוח אקסל ולהתחיל לחפש.
+גם אני הייתי שם. אז בניתי פתרון — *VeriBayit*
+🏦 מקבלת את דף הבנק של חשבון הוועד  ומזהה כל תנועה אוטומטית  — מי שילם, כמה  ועל איזה חודש.
+ככה במקום לשבת עם אקסל ולהצליב ידנית — רואים הכל מסודר בלחיצה.
+
+💬 *תזכורת תשלום בוואטסאפ בלחיצה* — עם הסכום והחודשים מוכנים, בלי להעתיק כלום ובלי אי-נעימות.
+🧾 *ספקים, הוצאות ודוחות* — הכל מסודר, מוכן לישיבת הוועד.
+🔒 והכי חשוב בעיניי: *הכסף נשאר בחשבון הבנק של הוועד.* בלי עמלות סליקה, בלי להעביר כסף לגורם שלישי, התוכנה רק מזהה ומסדרת.
+המחיר: *פחות ממאה שקל לחודש — לכל הבניין.*
+
+ 🌐 לאתר: veribayit.com
+רוצים פשוט לראות איך זה מרגיש? יש *דמו חינם ל-3 ימים* עם נתוני דוגמה, בלי כרטיס אשראי ובלי התחייבות:
+👈 https://www.veribayit.com/demo
+יש שאלות? אני כאן, מוזמנים לכתוב לי בפרטי. 🙏`}];
+
 const MIGRATIONS={
   personalDM_v1(st){
     const vb=(st.projects||[]).find(p=>p.id==='p_vb'); if(!vb)return;
@@ -257,6 +274,12 @@ const MIGRATIONS={
     if(!Array.isArray(vb.drafts))vb.drafts=[];
     const have=new Set(vb.drafts.map(d=>d.title));
     CAMPAIGN_POSTS.forEach(p=>{ if(!have.has(p.title)) vb.drafts.push({id:uid(),title:p.title,body:p.body,status:'draft',date:todayStr()}); });
+  },
+  waSeed_v1(st){
+    const vb=(st.projects||[]).find(p=>p.id==='p_vb'); if(!vb)return;
+    if(!Array.isArray(vb.waMessages))vb.waMessages=[];
+    const have=new Set(vb.waMessages.map(m=>m.title));
+    WA_SEED.forEach(m=>{ if(!have.has(m.title)) vb.waMessages.push({id:uid(),...m}); });
   }
 };
 function applyMigrations(st){
@@ -466,7 +489,7 @@ function render(){
     +`<button class="pjt add" onclick="addProject()">➕ פרויקט</button>`;
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.t===state.meta.activeTab));
   document.getElementById('content').innerHTML=
-    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
+    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,wa:vWhatsapp,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
 }
 
 // ---- פרויקטים ----
@@ -696,6 +719,30 @@ function editTpl(id,defKind){
     {key:'kind',label:'סוג',type:'select',options:[{v:'public',l:'💬 פומבית (בקבוצה)'},{v:'private',l:'📩 פרטי (DM)'}],def:'public'},
     {key:'title',label:'כותרת',ph:'תגובה אמפתית'},{key:'body',label:'תוכן',type:'textarea',rows:5}
   ],t,o=>{if(!o.title){toast('צריך כותרת');return;}if(id)Object.assign(t,o);else p.templates.push({id:uid(),...o});save();render();});
+}
+
+// ---- הודעות וואטסאפ (פוסטים מוכנים לקבוצות) ----
+function vWhatsapp(){
+  const p=P(); if(!Array.isArray(p.waMessages)) p.waMessages=[];
+  const items=p.waMessages.length?p.waMessages.map(m=>`<div class="card">
+    <div class="row spread"><b>${esc(m.title||'הודעה')}</b>
+      <div class="row" style="gap:6px">
+        <button class="btn sm" onclick="copyWa('${m.id}')">📋 העתק</button>
+        <button class="btn sm ghost" onclick="editWa('${m.id}')">✏️</button>
+        <button class="btn sm danger-o" onclick="delItem('waMessages','${m.id}')">🗑️</button></div></div>
+    <pre class="body" style="white-space:pre-wrap">${esc(m.body)}</pre></div>`).join(''):'<div class="card empty">אין עדיין הודעות. לחץ "➕ הודעה חדשה".</div>';
+  return `<div class="row spread"><b>🟢 הודעות וואטסאפ — ${esc(p.name)}</b><button class="btn" onclick="editWa()">➕ הודעה חדשה</button></div>
+    <div class="help">📋 העתק → הדבק בקבוצת וואטסאפ. הכוכביות (*) הופכות להדגשה בוואטסאפ.</div>
+    ${items}`;
+}
+function copyWa(id){const m=P().waMessages.find(x=>x.id===id);if(m)copyText(m.body);}
+function editWa(id){
+  const p=P(); if(!Array.isArray(p.waMessages)) p.waMessages=[];
+  const m=id?p.waMessages.find(x=>x.id===id):{};
+  showForm(id?'עריכת הודעה':'הודעה חדשה',[
+    {key:'title',label:'כותרת לזיהוי',ph:'פוסט כללי — קבוצת גזברים'},
+    {key:'body',label:'תוכן ההודעה',type:'textarea',rows:14}
+  ],m,o=>{if(!o.body){toast('צריך תוכן');return;}if(id)Object.assign(m,o);else p.waMessages.push({id:uid(),...o});save();render();});
 }
 
 // ---- סטודיו פוסטים ----
