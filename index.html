@@ -123,6 +123,7 @@
     <button class="tab" data-t="groups">👥 קבוצות</button>
     <button class="tab" data-t="posts">📌 פוסטים</button>
     <button class="tab" data-t="leads">👤 לידים</button>
+    <button class="tab" data-t="templates">💬 תגובות</button>
     <button class="tab" data-t="media">📣 מדיה</button>
     <button class="tab" data-t="backup">⚙️ הגדרות</button>
   </div>
@@ -457,7 +458,7 @@ function gName(id){const g=P().groups.find(x=>x.id===id);return g?g.name:'—';}
 // ============================================================
 function render(){
   dailyReset();
-  if(['templates','studio'].includes(state.meta.activeTab)) state.meta.activeTab='posts';
+  if(state.meta.activeTab==='studio') state.meta.activeTab='posts';
   renderSyncBar();
   // בר פרויקטים
   document.getElementById('pjtbar').innerHTML=
@@ -465,7 +466,7 @@ function render(){
     +`<button class="pjt add" onclick="addProject()">➕ פרויקט</button>`;
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.t===state.meta.activeTab));
   document.getElementById('content').innerHTML=
-    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
+    ({dash:vDash,groups:vGroups,posts:vPosts,leads:vLeads,templates:vTemplates,media:vMedia,backup:vBackup}[state.meta.activeTab]||vDash)();
 }
 
 // ---- פרויקטים ----
